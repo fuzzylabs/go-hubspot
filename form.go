@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/fuzzylabs/ehe-hubspot/schema"
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
@@ -108,7 +107,7 @@ func (r HubspotResponse) GetNextAfter() (string, error) {
 }
 
 // SearchForApplicationID searches for a submission on Hubspot for a given Application ID
-func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (*schema.ApplicationForm, error) {
+func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (map[string]string, error) {
 	log.Printf("Searching for submission with Application ID %s\n", applicationId)
 
 	after := ""
@@ -132,29 +131,7 @@ func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (*schema.
 				return nil, err
 			}
 		} else {
-
-			var submission schema.ApplicationForm
-			submissionJSON, err := json.Marshal(submissionMap)
-			if err != nil {
-				return nil, err
-			}
-
-			err = json.Unmarshal(submissionJSON, &submission)
-			if err != nil {
-				return nil, err
-			}
-
-			// Manually set company name since protobuf sets the companyName json field to `company_name` when actually
-			// it is `company`
-			companyName, ok := submissionMap["company"]
-
-			if !ok {
-				return nil, errors.New(fmt.Sprintf("The submission '%s' found does not have a company number", applicationId))
-			}
-
-			submission.CompanyName = companyName
-
-			return &submission, err
+			return submissionMap, nil
 		}
 	}
 
