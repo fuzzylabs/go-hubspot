@@ -354,7 +354,7 @@ func TestUpdateDealFlowCardValidationStatus(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=apikey" {
+			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=api_key" {
 				// This is a deal flow creation call
 				// Test the body
 

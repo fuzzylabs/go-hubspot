@@ -224,7 +224,7 @@ func TestSearchForApplicationID(t *testing.T) {
 
 	form, err := api.SearchForApplicationID("application_id1")
 
-	if err != nil || form.ApplicationId != "application_id1" || form.CompanyName != "company1" {
+	if err != nil || form["application_id"] != "application_id1" || form["company"] != "company1" {
 		t.Errorf("Expected to find form with application_id1 on page 1")
 	}
 
@@ -234,7 +234,7 @@ func TestSearchForApplicationID(t *testing.T) {
 
 	form, err = api.SearchForApplicationID("application_id2")
 
-	if err != nil || form.ApplicationId != "application_id2" || form.CompanyName != "company2" {
+	if err != nil || form["application_id"] != "application_id2" || form["company"] != "company2" {
 		t.Errorf("Expected to find form with application_id2 on page 2")
 	}
 
