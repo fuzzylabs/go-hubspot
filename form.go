@@ -1,10 +1,10 @@
 package ehe_hubspot
 
 import (
-	"ehe.capital/ehe_hubspot/schema"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/fuzzylabs/ehe-hubspot/schema"
 	"io/ioutil"
 
 	log "github.com/sirupsen/logrus"
