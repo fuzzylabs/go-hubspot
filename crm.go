@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type HubspotCRMApi struct {
+type HubspotCRMAPI struct {
 	APIKey     string
 	httpClient IHTTPClient
 }
@@ -51,9 +51,17 @@ type hubSpotSearchRequest struct {
 	Properties   []string      `json:"properties"`
 }
 
+// NewHubspotCRMAPI creates new HubspotCRMAPI with form ID and API key
+func NewHubspotCRMAPI(apiKey string) HubspotCRMAPI {
+	return HubspotCRMAPI{
+		APIKey:     apiKey,
+		httpClient: HTTPClient{},
+	}
+}
+
 // GetCompanyForContact returns the company id for the contact with the given id
 // If no company is found "" is returned, no error is thrown
-func (api HubspotFormAPI) GetCompanyForContact(contactID string) (string, error) {
+func (api HubspotCRMAPI) GetCompanyForContact(contactID string) (string, error) {
 	url := fmt.Sprintf(
 		"https://api.hubapi.com/crm/v3/objects/contacts/%s?associations=company&archived=false&hapikey=%s",
 		contactID,
@@ -85,7 +93,7 @@ func (api HubspotFormAPI) GetCompanyForContact(contactID string) (string, error)
 	if len(companies) == 0 {
 		return "", nil
 	} else if len(companies) > 1 {
-		return "", errors.New(fmt.Sprintf("There are multiple companies associated with contact '%s'", contactID))
+		return "", errors.New(fmt.Sprintf("There are multiple companies associated with contact '%s' there should only be one", contactID))
 	} else {
 		return companies[0].Id, nil
 	}
@@ -93,7 +101,7 @@ func (api HubspotFormAPI) GetCompanyForContact(contactID string) (string, error)
 
 // GetDealForCompany returns the deal id associated with the given companyID
 // Returns "" with nil error if no company exists
-func (api HubspotFormAPI) GetDealForCompany(companyID string) (string, error) {
+func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 	url := fmt.Sprintf(
 		"https://api.hubapi.com/crm/v3/objects/companies/%s/associations/deal?limit=500&hapikey=%s",
 		companyID,
@@ -127,14 +135,14 @@ func (api HubspotFormAPI) GetDealForCompany(companyID string) (string, error) {
 	if len(dealAssociations) == 0 {
 		return "", nil
 	} else if len(dealAssociations) > 1 {
-		return "", errors.New(fmt.Sprintf("There are multiple deals associated with company '%s'", companyID))
+		return "", errors.New(fmt.Sprintf("There are multiple deals associated with company '%s' there should only be one", companyID))
 	} else {
 		return dealAssociations[0].Id, nil
 	}
 }
 
 // searchContactsForApplicationId searches for contacts with the given application ID and returns every result it finds
-func (api HubspotFormAPI) searchContactsForApplicationId(application_id string) ([]ContactResult, error) {
+func (api HubspotCRMAPI) searchContactsForApplicationId(application_id string) ([]ContactResult, error) {
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", api.APIKey)
 
 	searchQuery := hubSpotSearchRequest{
@@ -197,7 +205,7 @@ func (api HubspotFormAPI) searchContactsForApplicationId(application_id string) 
 }
 
 // GetContactID searches for contacts on HubSpot with a specific company number
-func (api HubspotFormAPI) GetContactID(applicationId string, companyNumber string) (string, error) {
+func (api HubspotCRMAPI) GetContactID(applicationId string, companyNumber string) (string, error) {
 	contacts, err := api.searchContactsForApplicationId(applicationId)
 	if err != nil {
 		return "", err
@@ -206,7 +214,7 @@ func (api HubspotFormAPI) GetContactID(applicationId string, companyNumber strin
 	if len(contacts) == 0 {
 		return "", errors.New(fmt.Sprintf("Could not find a contact with application ID '%s'", applicationId))
 	} else if len(contacts) > 1 {
-		return "", errors.New(fmt.Sprintf("Multiple contacts found for application ID '%s'", applicationId))
+		return "", errors.New(fmt.Sprintf("Multiple contacts found for application ID '%s' there should only be one", applicationId))
 	} else {
 		contact := contacts[0]
 		if contact.Properties["company_number"] != companyNumber {

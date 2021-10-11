@@ -132,19 +132,29 @@ func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (*schema.
 				return nil, err
 			}
 		} else {
-			companyNumber, ok := submissionMap["company_number"]
+
+			var submission schema.ApplicationForm
+			submissionJSON, err := json.Marshal(submissionMap)
+			if err != nil {
+				return nil, err
+			}
+
+			err = json.Unmarshal(submissionJSON, &submission)
+			if err != nil {
+				return nil, err
+			}
+
+			// Manually set company name since protobuf sets the companyName json field to `company_name` when actually
+			// it is `company`
+			companyName, ok := submissionMap["company"]
 
 			if !ok {
 				return nil, errors.New(fmt.Sprintf("The submission '%s' found does not have a company number", applicationId))
 			}
 
-			submission := &schema.ApplicationForm{
-				ApplicationId: applicationId,
-				CompanyName:   submissionMap["company"],
-				CompanyNumber: companyNumber,
-				Answers:       submissionMap,
-			}
-			return submission, err
+			submission.CompanyName = companyName
+
+			return &submission, err
 		}
 	}
 
