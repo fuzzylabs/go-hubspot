@@ -1,4 +1,4 @@
-module ehe.capital/ehe_hubspot
+module github.com/fuzzylabs/ehe-hubspot
 
 go 1.13
 
