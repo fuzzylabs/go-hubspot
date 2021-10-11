@@ -243,3 +243,49 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 
 	return nil
 }
+
+type dealUpdateValidationCheckDoneRequestProperties struct {
+	ValidationCheckFinished string `json:"validation_check_finished"`
+}
+
+type dealUpdateValidationCheckDoneRequest struct {
+	Properties dealUpdateValidationCheckDoneRequestProperties `json:"properties"`
+}
+
+// UpdateDealFlowCardValidationStatus updates the deal flow card attached to the given id with the given information
+func (api HubspotDealFlowAPI) UpdateDealFlowCardValidationStatus(
+	dealId string,
+	dealValidationCheckFinished bool,
+) error {
+
+	log.Infof("Updating a deal flow card")
+
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
+
+	strconv.FormatBool(dealValidationCheckFinished)
+
+	updateRequest := dealUpdateValidationCheckDoneRequest{
+		dealUpdateValidationCheckDoneRequestProperties{
+			strconv.FormatBool(dealValidationCheckFinished),
+		},
+	}
+
+	payloadBuf := new(bytes.Buffer)
+	err := json.NewEncoder(payloadBuf).Encode(updateRequest)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("PATCH", url, payloadBuf)
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		return err
+	}
+
+	_, err = api.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

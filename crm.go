@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type HubspotCRMAPI struct {
@@ -51,12 +50,65 @@ type hubSpotSearchRequest struct {
 	Properties   []string      `json:"properties"`
 }
 
+type updateProperties struct {
+	CompanyStatus  string `json:"company_status"`
+	DateOfCreation string `json:"date_of_creation"`
+	Exists         bool   `json:"exists"`
+	Valid          bool   `json:"valid"`
+	ApplicationId  string `json:"application_id"`
+	CompanyNumber  string `json:"company_number"`
+	Directors      string `json:"directors"`
+	FilingLink     string `json:"companies_house_filing_link"`
+}
+
+type updateRequest struct {
+	Properties updateProperties `json:"properties"`
+}
+
 // NewHubspotCRMAPI creates new HubspotCRMAPI with form ID and API key
 func NewHubspotCRMAPI(apiKey string) HubspotCRMAPI {
 	return HubspotCRMAPI{
 		APIKey:     apiKey,
 		httpClient: HTTPClient{},
 	}
+}
+
+// UpdateCompany updates company details in HubSpot CRM with companiesHouse record
+func (api HubspotCRMAPI) UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error {
+	url := fmt.Sprintf(
+		"https://api.hubapi.com/crm/v3/objects/companies/%s?hapikey=%s",
+		companyID,
+		api.APIKey,
+	)
+
+	req, _ := http.NewRequest("PATCH", url, jsonPayload)
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := api.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		var bodyString string
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			bodyString = ""
+		} else {
+			bodyString = string(bodyBytes)
+		}
+
+		return errors.New(fmt.Sprintf(
+			"Failed to update company with ID '%s': %s",
+			companyID,
+			bodyString,
+		))
+	}
+
+	return nil
 }
 
 // GetCompanyForContact returns the company id for the contact with the given id

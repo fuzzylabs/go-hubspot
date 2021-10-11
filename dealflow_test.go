@@ -347,3 +347,72 @@ func TestUpdateDealFlowCard(t *testing.T) {
 	}
 
 }
+
+func TestUpdateDealFlowCardValidationStatus(t *testing.T) {
+	mockHubspotHTTPClient := IHTTPClientMock{
+		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
+			url := fmt.Sprintf("%s", req.URL)
+
+			w := httptest.NewRecorder()
+			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=apikey" {
+				// This is a deal flow creation call
+				// Test the body
+
+				if req.Method != "PATCH" {
+					t.Errorf("UpdateDealFlowCardValidationStatus used incorrect request method, expected: PATCH, got: %s", req.Method)
+				}
+
+				expectedRequest := dealUpdateValidationCheckDoneRequest{
+					dealUpdateValidationCheckDoneRequestProperties{
+						"false",
+					},
+				}
+
+				body, err := ioutil.ReadAll(req.Body)
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						t.Errorf("Error closing mock request body: %s", err.Error())
+					}
+				}(req.Body)
+
+				if err != nil {
+					t.Errorf("Error reading UpdateDealFlowCardValidationStatus request body: %s", err.Error())
+				}
+
+				var request dealUpdateValidationCheckDoneRequest
+				err = json.Unmarshal(body, &request)
+				if err != nil {
+					t.Errorf("Error unmarshalling UpdateDealFlowCardValidationStatus request: %s", err.Error())
+				}
+
+				if !reflect.DeepEqual(expectedRequest, request) {
+					t.Errorf("Unexpected UpdateDealFlowCardValidationStatus request, expected:\n%s\ngot:\n%s", expectedRequest, request)
+				}
+
+				w.WriteHeader(200)
+
+				// Request normally responds with json about updated deal, this is not used in
+				// UpdateDealFlowCardValidationStatus so it is omitted from the test
+				// See: https://developers.hubspot.com/docs/api/crm/deals
+			} else {
+				t.Errorf("Unexpected url %s", url)
+			}
+
+			return w.Result(), nil
+		},
+	}
+
+	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
+
+	err := os.Setenv("DEALFLOW_ENABLED", "true")
+	if err != nil {
+		t.Errorf("Failed to set DEALFLOW_ENABLED env variable")
+	}
+
+	err = api.UpdateDealFlowCardValidationStatus("dealid", false)
+	if err != nil {
+		t.Errorf("Error on UpdateDealFlowCardValidationStatus: %s", err.Error())
+	}
+
+}
