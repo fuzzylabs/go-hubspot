@@ -10,6 +10,13 @@ import (
 	"net/http"
 )
 
+type IHubspotCRMAPI interface {
+	UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error
+	GetCompanyForContact(contactID string) (string, error)
+	GetDealForCompany(companyID string) (string, error)
+	GetContactID(applicationId string, companyNumber string) (string, error)
+}
+
 type HubspotCRMAPI struct {
 	APIKey     string
 	httpClient IHTTPClient

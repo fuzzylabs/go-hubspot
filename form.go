@@ -9,6 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type IHubspotFormAPI interface {
+	GetPageURL(after string) string
+	Query(after string) (*HubspotResponse, error)
+	SearchForApplicationID(applicationId string) (map[string]string, error)
+}
+
 // HubspotFormAPI is the structure to interact with Hubspot Form API
 type HubspotFormAPI struct {
 	URLTemplate string

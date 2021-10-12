@@ -13,6 +13,27 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type IHubspotDealFlowAPI interface {
+	AssociateDealFlowCard(dealId, assocId string, assocType CardAssociation) error
+	CreateDealFlowCard(
+		cardName string,
+		contactID string,
+		companyID string,
+		applicationId string,
+	) (*dealCreationResponse, error)
+	UpdateDealFlowCard(
+		dealId string,
+		dealName string,
+		dealStage string,
+		applicationId string,
+		dealValidationCheckFinished bool,
+	) error
+	UpdateDealFlowCardValidationStatus(
+		dealId string,
+		dealValidationCheckFinished bool,
+	) error
+}
+
 type HubspotDealFlowAPI struct {
 	APIKey     string
 	httpClient IHTTPClient
