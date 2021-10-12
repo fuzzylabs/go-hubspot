@@ -28,4 +28,18 @@ import (
 )
 ```
 
-## Development
+## Mocking
+`moq` is used to generate mocks:
+* Mocks for external interfaces to use within unit tests
+* Mocks for `ehe-hubspot` API interfaces, for to make testing of applications that use the library easier
+
+```
+go generate
+```
+
+## Testing
+```
+go vet
+go test -coverprofile=coverage.out
+go tool cover -html=coverage.out # To view test coverage
+```
