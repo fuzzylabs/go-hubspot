@@ -101,7 +101,7 @@ func TestGetByApplicationID(t *testing.T) {
 
 	_, err := response.GetByKeyValue("application_id", "application_id")
 
-	if err == nil || err.Error() != "Submission with applicationId `application_id` not found" {
+	if err == nil || err.Error() != "Submission with application_id `application_id` not found" {
 		t.Errorf("Expected application_id not found")
 	}
 
