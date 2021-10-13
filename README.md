@@ -1,6 +1,6 @@
 # EHE HubSpot library
 
-This library provides generic methods for the interation with HubSpot Forms, CRM and DealFlow APIs
+This library provides generic methods for the interation with HubSpot [Forms](https://legacydocs.hubspot.com/docs/methods/forms/forms_overview), CRM ([Contacts](https://developers.hubspot.com/docs/api/crm/contacts) and [Companies](https://developers.hubspot.com/docs/api/crm/companies)) and [DealFlow](https://developers.hubspot.com/docs/api/crm/deals) APIs
 
 ## Usage
 You can install the module directly from GitHub
