@@ -20,14 +20,11 @@ var _ IHubspotDealFlowAPI = &IHubspotDealFlowAPIMock{}
 // 			AssociateDealFlowCardFunc: func(dealId string, assocId string, assocType CardAssociation) error {
 // 				panic("mock out the AssociateDealFlowCard method")
 // 			},
-// 			CreateDealFlowCardFunc: func(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error) {
+// 			CreateDealFlowCardFunc: func(cardName string, contactID string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error) {
 // 				panic("mock out the CreateDealFlowCard method")
 // 			},
-// 			UpdateDealFlowCardFunc: func(dealId string, dealName string, dealStage string, applicationId string, dealValidationCheckFinished bool) error {
+// 			UpdateDealFlowCardFunc: func(dealId string, properties map[string]string) error {
 // 				panic("mock out the UpdateDealFlowCard method")
-// 			},
-// 			UpdateDealFlowCardValidationStatusFunc: func(dealId string, dealValidationCheckFinished bool) error {
-// 				panic("mock out the UpdateDealFlowCardValidationStatus method")
 // 			},
 // 		}
 //
@@ -40,13 +37,10 @@ type IHubspotDealFlowAPIMock struct {
 	AssociateDealFlowCardFunc func(dealId string, assocId string, assocType CardAssociation) error
 
 	// CreateDealFlowCardFunc mocks the CreateDealFlowCard method.
-	CreateDealFlowCardFunc func(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error)
+	CreateDealFlowCardFunc func(cardName string, contactID string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error)
 
 	// UpdateDealFlowCardFunc mocks the UpdateDealFlowCard method.
-	UpdateDealFlowCardFunc func(dealId string, dealName string, dealStage string, applicationId string, dealValidationCheckFinished bool) error
-
-	// UpdateDealFlowCardValidationStatusFunc mocks the UpdateDealFlowCardValidationStatus method.
-	UpdateDealFlowCardValidationStatusFunc func(dealId string, dealValidationCheckFinished bool) error
+	UpdateDealFlowCardFunc func(dealId string, properties map[string]string) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -67,34 +61,26 @@ type IHubspotDealFlowAPIMock struct {
 			ContactID string
 			// CompanyID is the companyID argument value.
 			CompanyID string
-			// ApplicationId is the applicationId argument value.
-			ApplicationId string
+			// StageName is the stageName argument value.
+			StageName string
+			// Pipeline is the pipeline argument value.
+			Pipeline string
+			// OwnerId is the ownerId argument value.
+			OwnerId string
+			// OtherProperties is the otherProperties argument value.
+			OtherProperties map[string]string
 		}
 		// UpdateDealFlowCard holds details about calls to the UpdateDealFlowCard method.
 		UpdateDealFlowCard []struct {
 			// DealId is the dealId argument value.
 			DealId string
-			// DealName is the dealName argument value.
-			DealName string
-			// DealStage is the dealStage argument value.
-			DealStage string
-			// ApplicationId is the applicationId argument value.
-			ApplicationId string
-			// DealValidationCheckFinished is the dealValidationCheckFinished argument value.
-			DealValidationCheckFinished bool
-		}
-		// UpdateDealFlowCardValidationStatus holds details about calls to the UpdateDealFlowCardValidationStatus method.
-		UpdateDealFlowCardValidationStatus []struct {
-			// DealId is the dealId argument value.
-			DealId string
-			// DealValidationCheckFinished is the dealValidationCheckFinished argument value.
-			DealValidationCheckFinished bool
+			// Properties is the properties argument value.
+			Properties map[string]string
 		}
 	}
-	lockAssociateDealFlowCard              sync.RWMutex
-	lockCreateDealFlowCard                 sync.RWMutex
-	lockUpdateDealFlowCard                 sync.RWMutex
-	lockUpdateDealFlowCardValidationStatus sync.RWMutex
+	lockAssociateDealFlowCard sync.RWMutex
+	lockCreateDealFlowCard    sync.RWMutex
+	lockUpdateDealFlowCard    sync.RWMutex
 }
 
 // AssociateDealFlowCard calls AssociateDealFlowCardFunc.
@@ -137,41 +123,53 @@ func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCardCalls() []struct {
 }
 
 // CreateDealFlowCard calls CreateDealFlowCardFunc.
-func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCard(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error) {
+func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCard(cardName string, contactID string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error) {
 	if mock.CreateDealFlowCardFunc == nil {
 		panic("IHubspotDealFlowAPIMock.CreateDealFlowCardFunc: method is nil but IHubspotDealFlowAPI.CreateDealFlowCard was just called")
 	}
 	callInfo := struct {
-		CardName      string
-		ContactID     string
-		CompanyID     string
-		ApplicationId string
+		CardName        string
+		ContactID       string
+		CompanyID       string
+		StageName       string
+		Pipeline        string
+		OwnerId         string
+		OtherProperties map[string]string
 	}{
-		CardName:      cardName,
-		ContactID:     contactID,
-		CompanyID:     companyID,
-		ApplicationId: applicationId,
+		CardName:        cardName,
+		ContactID:       contactID,
+		CompanyID:       companyID,
+		StageName:       stageName,
+		Pipeline:        pipeline,
+		OwnerId:         ownerId,
+		OtherProperties: otherProperties,
 	}
 	mock.lockCreateDealFlowCard.Lock()
 	mock.calls.CreateDealFlowCard = append(mock.calls.CreateDealFlowCard, callInfo)
 	mock.lockCreateDealFlowCard.Unlock()
-	return mock.CreateDealFlowCardFunc(cardName, contactID, companyID, applicationId)
+	return mock.CreateDealFlowCardFunc(cardName, contactID, companyID, stageName, pipeline, ownerId, otherProperties)
 }
 
 // CreateDealFlowCardCalls gets all the calls that were made to CreateDealFlowCard.
 // Check the length with:
 //     len(mockedIHubspotDealFlowAPI.CreateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCardCalls() []struct {
-	CardName      string
-	ContactID     string
-	CompanyID     string
-	ApplicationId string
+	CardName        string
+	ContactID       string
+	CompanyID       string
+	StageName       string
+	Pipeline        string
+	OwnerId         string
+	OtherProperties map[string]string
 } {
 	var calls []struct {
-		CardName      string
-		ContactID     string
-		CompanyID     string
-		ApplicationId string
+		CardName        string
+		ContactID       string
+		CompanyID       string
+		StageName       string
+		Pipeline        string
+		OwnerId         string
+		OtherProperties map[string]string
 	}
 	mock.lockCreateDealFlowCard.RLock()
 	calls = mock.calls.CreateDealFlowCard
@@ -180,83 +178,36 @@ func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCardCalls() []struct {
 }
 
 // UpdateDealFlowCard calls UpdateDealFlowCardFunc.
-func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCard(dealId string, dealName string, dealStage string, applicationId string, dealValidationCheckFinished bool) error {
+func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCard(dealId string, properties map[string]string) error {
 	if mock.UpdateDealFlowCardFunc == nil {
 		panic("IHubspotDealFlowAPIMock.UpdateDealFlowCardFunc: method is nil but IHubspotDealFlowAPI.UpdateDealFlowCard was just called")
 	}
 	callInfo := struct {
-		DealId                      string
-		DealName                    string
-		DealStage                   string
-		ApplicationId               string
-		DealValidationCheckFinished bool
+		DealId     string
+		Properties map[string]string
 	}{
-		DealId:                      dealId,
-		DealName:                    dealName,
-		DealStage:                   dealStage,
-		ApplicationId:               applicationId,
-		DealValidationCheckFinished: dealValidationCheckFinished,
+		DealId:     dealId,
+		Properties: properties,
 	}
 	mock.lockUpdateDealFlowCard.Lock()
 	mock.calls.UpdateDealFlowCard = append(mock.calls.UpdateDealFlowCard, callInfo)
 	mock.lockUpdateDealFlowCard.Unlock()
-	return mock.UpdateDealFlowCardFunc(dealId, dealName, dealStage, applicationId, dealValidationCheckFinished)
+	return mock.UpdateDealFlowCardFunc(dealId, properties)
 }
 
 // UpdateDealFlowCardCalls gets all the calls that were made to UpdateDealFlowCard.
 // Check the length with:
 //     len(mockedIHubspotDealFlowAPI.UpdateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCardCalls() []struct {
-	DealId                      string
-	DealName                    string
-	DealStage                   string
-	ApplicationId               string
-	DealValidationCheckFinished bool
+	DealId     string
+	Properties map[string]string
 } {
 	var calls []struct {
-		DealId                      string
-		DealName                    string
-		DealStage                   string
-		ApplicationId               string
-		DealValidationCheckFinished bool
+		DealId     string
+		Properties map[string]string
 	}
 	mock.lockUpdateDealFlowCard.RLock()
 	calls = mock.calls.UpdateDealFlowCard
 	mock.lockUpdateDealFlowCard.RUnlock()
-	return calls
-}
-
-// UpdateDealFlowCardValidationStatus calls UpdateDealFlowCardValidationStatusFunc.
-func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCardValidationStatus(dealId string, dealValidationCheckFinished bool) error {
-	if mock.UpdateDealFlowCardValidationStatusFunc == nil {
-		panic("IHubspotDealFlowAPIMock.UpdateDealFlowCardValidationStatusFunc: method is nil but IHubspotDealFlowAPI.UpdateDealFlowCardValidationStatus was just called")
-	}
-	callInfo := struct {
-		DealId                      string
-		DealValidationCheckFinished bool
-	}{
-		DealId:                      dealId,
-		DealValidationCheckFinished: dealValidationCheckFinished,
-	}
-	mock.lockUpdateDealFlowCardValidationStatus.Lock()
-	mock.calls.UpdateDealFlowCardValidationStatus = append(mock.calls.UpdateDealFlowCardValidationStatus, callInfo)
-	mock.lockUpdateDealFlowCardValidationStatus.Unlock()
-	return mock.UpdateDealFlowCardValidationStatusFunc(dealId, dealValidationCheckFinished)
-}
-
-// UpdateDealFlowCardValidationStatusCalls gets all the calls that were made to UpdateDealFlowCardValidationStatus.
-// Check the length with:
-//     len(mockedIHubspotDealFlowAPI.UpdateDealFlowCardValidationStatusCalls())
-func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCardValidationStatusCalls() []struct {
-	DealId                      string
-	DealValidationCheckFinished bool
-} {
-	var calls []struct {
-		DealId                      string
-		DealValidationCheckFinished bool
-	}
-	mock.lockUpdateDealFlowCardValidationStatus.RLock()
-	calls = mock.calls.UpdateDealFlowCardValidationStatus
-	mock.lockUpdateDealFlowCardValidationStatus.RUnlock()
 	return calls
 }

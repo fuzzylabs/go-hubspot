@@ -57,21 +57,6 @@ type hubSpotSearchRequest struct {
 	Properties   []string      `json:"properties"`
 }
 
-type updateProperties struct {
-	CompanyStatus  string `json:"company_status"`
-	DateOfCreation string `json:"date_of_creation"`
-	Exists         bool   `json:"exists"`
-	Valid          bool   `json:"valid"`
-	ApplicationId  string `json:"application_id"`
-	CompanyNumber  string `json:"company_number"`
-	Directors      string `json:"directors"`
-	FilingLink     string `json:"companies_house_filing_link"`
-}
-
-type updateRequest struct {
-	Properties updateProperties `json:"properties"`
-}
-
 // NewHubspotCRMAPI creates new HubspotCRMAPI with form ID and API key
 func NewHubspotCRMAPI(apiKey string) HubspotCRMAPI {
 	return HubspotCRMAPI{

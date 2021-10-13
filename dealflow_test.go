@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -37,7 +37,6 @@ func TestCreateDealFlowCard(t *testing.T) {
 			"HsLastModifiedDate",
 			"HubspotOwnerId",
 			"Pipeline",
-			"false",
 		},
 		"CreatedAt",
 		"UpdatedAt",
@@ -59,13 +58,13 @@ func TestCreateDealFlowCard(t *testing.T) {
 				// Test the body
 
 				expectedRequest := dealCreationRequest{
-					dealCreationRequestProperties{
-						"cardName",
-						"stageName",
-						"pipeline",
-						"applicationId",
-						"HubspotOwnerId",
-						"false",
+					map[string]string{
+						"dealname":                  "cardName",
+						"dealstage":                 "stageName",
+						"pipeline":                  "pipeline",
+						"hubspot_owner_id":          "HubspotOwnerId",
+						"application_id":            "applicationId",
+						"validation_check_finished": "false",
 					},
 				}
 
@@ -183,23 +182,18 @@ func TestCreateDealFlowCard(t *testing.T) {
 
 	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
 
-	// Set environment variables required for CreateDealFlowCard
-	err := os.Setenv("DEALFLOW_STARTING_STAGE", "stageName")
-	if err != nil {
-		t.Errorf("Error setting environment variable DEALFLOW_STARTING_STAGE: %s", err.Error())
-	}
-
-	err = os.Setenv("DEALFLOW_PIPELINE_NAME", "pipeline")
-	if err != nil {
-		t.Errorf("Error setting environment variable DEALFLOW_PIPELINE_NAME: %s", err.Error())
-	}
-
-	err = os.Setenv("DEALFLOW_OWNER_ID", "HubspotOwnerId")
-	if err != nil {
-		t.Errorf("Error setting environment variable DEALFLOW_OWNER_ID: %s", err.Error())
-	}
-
-	response, err := api.CreateDealFlowCard("cardName", "contactId", "companyId", "applicationId")
+	response, err := api.CreateDealFlowCard(
+		"cardName",
+		"contactId",
+		"companyId",
+		"stageName",
+		"pipeline",
+		"HubspotOwnerId",
+		map[string]string{
+			"application_id":            "applicationId",
+			"validation_check_finished": "false",
+		},
+	)
 	if err != nil {
 		t.Errorf("CreateDealFlowCard returned an error: %s", err.Error())
 		return
@@ -291,11 +285,11 @@ func TestUpdateDealFlowCard(t *testing.T) {
 				}
 
 				expectedRequest := dealUpdateRequest{
-					dealUpdateRequestProperties{
-						"dealName",
-						"stageName",
-						"applicationId",
-						"false",
+					map[string]string{
+						"dealname":                  "dealName",
+						"dealstage":                 "stageName",
+						"application_id":            "applicationId",
+						"validation_check_finished": "false",
 					},
 				}
 
@@ -336,7 +330,15 @@ func TestUpdateDealFlowCard(t *testing.T) {
 
 	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
 
-	err := api.UpdateDealFlowCard("dealid", "dealName", "stageName", "applicationId", false)
+	err := api.UpdateDealFlowCard(
+		"dealid",
+		map[string]string{
+			"dealname":                  "dealName",
+			"dealstage":                 "stageName",
+			"application_id":            "applicationId",
+			"validation_check_finished": strconv.FormatBool(false),
+		},
+	)
 	if err != nil {
 		t.Errorf("Error on UpdateDealFlowCardValidationStatus: %s", err.Error())
 	}
@@ -348,71 +350,71 @@ func TestUpdateDealFlowCard(t *testing.T) {
 
 }
 
-func TestUpdateDealFlowCardValidationStatus(t *testing.T) {
-	mockHubspotHTTPClient := IHTTPClientMock{
-		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
-			url := fmt.Sprintf("%s", req.URL)
-
-			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=api_key" {
-				// This is a deal flow creation call
-				// Test the body
-
-				if req.Method != "PATCH" {
-					t.Errorf("UpdateDealFlowCardValidationStatus used incorrect request method, expected: PATCH, got: %s", req.Method)
-				}
-
-				expectedRequest := dealUpdateValidationCheckDoneRequest{
-					dealUpdateValidationCheckDoneRequestProperties{
-						"false",
-					},
-				}
-
-				body, err := ioutil.ReadAll(req.Body)
-				defer func(Body io.ReadCloser) {
-					err := Body.Close()
-					if err != nil {
-						t.Errorf("Error closing mock request body: %s", err.Error())
-					}
-				}(req.Body)
-
-				if err != nil {
-					t.Errorf("Error reading UpdateDealFlowCardValidationStatus request body: %s", err.Error())
-				}
-
-				var request dealUpdateValidationCheckDoneRequest
-				err = json.Unmarshal(body, &request)
-				if err != nil {
-					t.Errorf("Error unmarshalling UpdateDealFlowCardValidationStatus request: %s", err.Error())
-				}
-
-				if !reflect.DeepEqual(expectedRequest, request) {
-					t.Errorf("Unexpected UpdateDealFlowCardValidationStatus request, expected:\n%s\ngot:\n%s", expectedRequest, request)
-				}
-
-				w.WriteHeader(200)
-
-				// Request normally responds with json about updated deal, this is not used in
-				// UpdateDealFlowCardValidationStatus so it is omitted from the test
-				// See: https://developers.hubspot.com/docs/api/crm/deals
-			} else {
-				t.Errorf("Unexpected url %s", url)
-			}
-
-			return w.Result(), nil
-		},
-	}
-
-	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
-
-	err := os.Setenv("DEALFLOW_ENABLED", "true")
-	if err != nil {
-		t.Errorf("Failed to set DEALFLOW_ENABLED env variable")
-	}
-
-	err = api.UpdateDealFlowCardValidationStatus("dealid", false)
-	if err != nil {
-		t.Errorf("Error on UpdateDealFlowCardValidationStatus: %s", err.Error())
-	}
-
-}
+//func TestUpdateDealFlowCardValidationStatus(t *testing.T) {
+//	mockHubspotHTTPClient := IHTTPClientMock{
+//		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
+//			url := fmt.Sprintf("%s", req.URL)
+//
+//			w := httptest.NewRecorder()
+//			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=api_key" {
+//				// This is a deal flow creation call
+//				// Test the body
+//
+//				if req.Method != "PATCH" {
+//					t.Errorf("UpdateDealFlowCardValidationStatus used incorrect request method, expected: PATCH, got: %s", req.Method)
+//				}
+//
+//				expectedRequest := dealUpdateValidationCheckDoneRequest{
+//					dealUpdateValidationCheckDoneRequestProperties{
+//						"false",
+//					},
+//				}
+//
+//				body, err := ioutil.ReadAll(req.Body)
+//				defer func(Body io.ReadCloser) {
+//					err := Body.Close()
+//					if err != nil {
+//						t.Errorf("Error closing mock request body: %s", err.Error())
+//					}
+//				}(req.Body)
+//
+//				if err != nil {
+//					t.Errorf("Error reading UpdateDealFlowCardValidationStatus request body: %s", err.Error())
+//				}
+//
+//				var request dealUpdateValidationCheckDoneRequest
+//				err = json.Unmarshal(body, &request)
+//				if err != nil {
+//					t.Errorf("Error unmarshalling UpdateDealFlowCardValidationStatus request: %s", err.Error())
+//				}
+//
+//				if !reflect.DeepEqual(expectedRequest, request) {
+//					t.Errorf("Unexpected UpdateDealFlowCardValidationStatus request, expected:\n%s\ngot:\n%s", expectedRequest, request)
+//				}
+//
+//				w.WriteHeader(200)
+//
+//				// Request normally responds with json about updated deal, this is not used in
+//				// UpdateDealFlowCardValidationStatus so it is omitted from the test
+//				// See: https://developers.hubspot.com/docs/api/crm/deals
+//			} else {
+//				t.Errorf("Unexpected url %s", url)
+//			}
+//
+//			return w.Result(), nil
+//		},
+//	}
+//
+//	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
+//
+//	err := os.Setenv("DEALFLOW_ENABLED", "true")
+//	if err != nil {
+//		t.Errorf("Failed to set DEALFLOW_ENABLED env variable")
+//	}
+//
+//	err = api.UpdateDealFlowCardValidationStatus("dealid", false)
+//	if err != nil {
+//		t.Errorf("Error on UpdateDealFlowCardValidationStatus: %s", err.Error())
+//	}
+//
+//}

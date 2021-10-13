@@ -3,14 +3,10 @@ package ehe_hubspot
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strconv"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type IHubspotDealFlowAPI interface {
@@ -19,18 +15,14 @@ type IHubspotDealFlowAPI interface {
 		cardName string,
 		contactID string,
 		companyID string,
-		applicationId string,
+		stageName string,
+		pipeline string,
+		ownerId string,
+		otherProperties map[string]string,
 	) (*DealCreationResponse, error)
 	UpdateDealFlowCard(
 		dealId string,
-		dealName string,
-		dealStage string,
-		applicationId string,
-		dealValidationCheckFinished bool,
-	) error
-	UpdateDealFlowCardValidationStatus(
-		dealId string,
-		dealValidationCheckFinished bool,
+		properties map[string]string,
 	) error
 }
 
@@ -40,31 +32,30 @@ type HubspotDealFlowAPI struct {
 }
 
 // dealCreationRequestProperties is a representation of the deal creation request to HubSpot
-type dealCreationRequestProperties struct {
-	DealName                string `json:"dealname"`
-	DealStage               string `json:"dealstage"`
-	Pipeline                string `json:"pipeline"`
-	ApplicationId           string `json:"application_id"`
-	HubspotOwnerId          string `json:"hubspot_owner_id"`
-	ValidationCheckFinished string `json:"validation_check_finished"`
-}
+//type dealCreationRequestProperties struct {
+//	DealName                string `json:"dealname"`
+//	DealStage               string `json:"dealstage"`
+//	Pipeline                string `json:"pipeline"`
+//	ApplicationId           string `json:"application_id"`
+//	HubspotOwnerId          string `json:"hubspot_owner_id"`
+//	ValidationCheckFinished string `json:"validation_check_finished"`
+//}
 
 // dealCreationRequest is a representation of the deal creation request to HubSpot
 type dealCreationRequest struct {
-	Properties dealCreationRequestProperties `json:"properties"`
+	Properties map[string]string `json:"properties"`
 }
 
 // dealCreationResponseProperties is a representation of the deal creation response from HubSpot
 type dealCreationResponseProperties struct {
-	Amount                  string `json:"amount"`
-	CloseDate               string `json:"closedate"`
-	CreateDate              string `json:"createdate"`
-	DealName                string `json:"dealname"`
-	DealStage               string `json:"dealstage"`
-	HsLastModifiedDate      string `json:"hs_lastmodifieddate"`
-	HubspotOwnerId          string `json:"hubspot_owner_id"`
-	Pipeline                string `json:"pipeline"`
-	ValidationCheckFinished string `json:"validation_check_finished"`
+	Amount             string `json:"amount"`
+	CloseDate          string `json:"closedate"`
+	CreateDate         string `json:"createdate"`
+	DealName           string `json:"dealname"`
+	DealStage          string `json:"dealstage"`
+	HsLastModifiedDate string `json:"hs_lastmodifieddate"`
+	HubspotOwnerId     string `json:"hubspot_owner_id"`
+	Pipeline           string `json:"pipeline"`
 }
 
 // DealCreationResponse is a representation of the deal creation response from HubSpot
@@ -84,7 +75,7 @@ type dealUpdateRequestProperties struct {
 }
 
 type dealUpdateRequest struct {
-	Properties dealUpdateRequestProperties `json:"properties"`
+	Properties map[string]string `json:"properties"`
 }
 
 type CardAssociation int64
@@ -137,42 +128,32 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId string, asso
 }
 
 // CreateDealFlowCard creates a deal flow card with the given parameters in HubSpot,
-// and associates it with a company and contact based on applicationId
+// and associates it with a company and contact
 func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	cardName string,
 	contactID string,
 	companyID string,
-	applicationId string,
+	stageName string,
+	pipeline string,
+	ownerId string,
+	otherProperties map[string]string,
 ) (*DealCreationResponse, error) {
 
 	log.Infof("Creating a deal flow card")
 
-	stageName, exists := os.LookupEnv("DEALFLOW_STARTING_STAGE")
-	if !exists {
-		return nil, errors.New("DEALFLOW_STARTING_STAGE environment variable is unset")
-	}
-
-	pipeline, exists := os.LookupEnv("DEALFLOW_PIPELINE_NAME")
-	if !exists {
-		return nil, errors.New("DEALFLOW_PIPELINE_NAME environment variable is unset")
-	}
-
-	ownerId, exists := os.LookupEnv("DEALFLOW_OWNER_ID")
-	if !exists {
-		return nil, errors.New("DEALFLOW_OWNER_ID environment variable is unset")
-	}
-
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals?hapikey=%s", api.APIKey)
 
 	creationRequest := dealCreationRequest{
-		dealCreationRequestProperties{
-			cardName,
-			stageName,
-			pipeline,
-			applicationId,
-			ownerId,
-			"false",
+		map[string]string{
+			"dealname":         cardName,
+			"dealstage":        stageName,
+			"pipeline":         pipeline,
+			"hubspot_owner_id": ownerId,
 		},
+	}
+
+	for key, value := range otherProperties {
+		creationRequest.Properties[key] = value
 	}
 
 	payloadBuf := new(bytes.Buffer)
@@ -226,10 +207,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 // UpdateDealFlowCard updates the deal flow card attached to the given id with the given information
 func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 	dealId string,
-	dealName string,
-	dealStage string,
-	applicationId string,
-	dealValidationCheckFinished bool,
+	properties map[string]string,
 ) error {
 
 	log.Infof("Updating a deal flow card")
@@ -237,12 +215,7 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
 
 	updateRequest := dealUpdateRequest{
-		dealUpdateRequestProperties{
-			dealName,
-			dealStage,
-			applicationId,
-			strconv.FormatBool(dealValidationCheckFinished),
-		},
+		properties,
 	}
 
 	payloadBuf := new(bytes.Buffer)
@@ -265,48 +238,48 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 	return nil
 }
 
-type dealUpdateValidationCheckDoneRequestProperties struct {
-	ValidationCheckFinished string `json:"validation_check_finished"`
-}
-
-type dealUpdateValidationCheckDoneRequest struct {
-	Properties dealUpdateValidationCheckDoneRequestProperties `json:"properties"`
-}
-
-// UpdateDealFlowCardValidationStatus updates the deal flow card attached to the given id with the given information
-func (api HubspotDealFlowAPI) UpdateDealFlowCardValidationStatus(
-	dealId string,
-	dealValidationCheckFinished bool,
-) error {
-
-	log.Infof("Updating a deal flow card")
-
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
-
-	strconv.FormatBool(dealValidationCheckFinished)
-
-	updateRequest := dealUpdateValidationCheckDoneRequest{
-		dealUpdateValidationCheckDoneRequestProperties{
-			strconv.FormatBool(dealValidationCheckFinished),
-		},
-	}
-
-	payloadBuf := new(bytes.Buffer)
-	err := json.NewEncoder(payloadBuf).Encode(updateRequest)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("PATCH", url, payloadBuf)
-	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return err
-	}
-
-	_, err = api.httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+//type dealUpdateValidationCheckDoneRequestProperties struct {
+//	ValidationCheckFinished string `json:"validation_check_finished"`
+//}
+//
+//type dealUpdateValidationCheckDoneRequest struct {
+//	Properties dealUpdateValidationCheckDoneRequestProperties `json:"properties"`
+//}
+//
+//// UpdateDealFlowCardValidationStatus updates the deal flow card attached to the given id with the given information
+//func (api HubspotDealFlowAPI) UpdateDealFlowCardValidationStatus(
+//	dealId string,
+//	dealValidationCheckFinished bool,
+//) error {
+//
+//	log.Infof("Updating a deal flow card")
+//
+//	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
+//
+//	strconv.FormatBool(dealValidationCheckFinished)
+//
+//	updateRequest := dealUpdateValidationCheckDoneRequest{
+//		dealUpdateValidationCheckDoneRequestProperties{
+//			strconv.FormatBool(dealValidationCheckFinished),
+//		},
+//	}
+//
+//	payloadBuf := new(bytes.Buffer)
+//	err := json.NewEncoder(payloadBuf).Encode(updateRequest)
+//	if err != nil {
+//		return err
+//	}
+//
+//	req, err := http.NewRequest("PATCH", url, payloadBuf)
+//	req.Header.Set("Content-Type", "application/json")
+//	if err != nil {
+//		return err
+//	}
+//
+//	_, err = api.httpClient.Do(req)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
