@@ -26,7 +26,7 @@ func getMockDealFlowAPI(mockClient *IHTTPClientMock) HubspotDealFlowAPI {
 
 func TestCreateDealFlowCard(t *testing.T) {
 
-	expected := dealCreationResponse{
+	expected := DealCreationResponse{
 		"dealid",
 		dealCreationResponseProperties{
 			"Amount",

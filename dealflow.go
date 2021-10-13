@@ -20,7 +20,7 @@ type IHubspotDealFlowAPI interface {
 		contactID string,
 		companyID string,
 		applicationId string,
-	) (*dealCreationResponse, error)
+	) (*DealCreationResponse, error)
 	UpdateDealFlowCard(
 		dealId string,
 		dealName string,
@@ -67,8 +67,8 @@ type dealCreationResponseProperties struct {
 	ValidationCheckFinished string `json:"validation_check_finished"`
 }
 
-// dealCreationResponse is a representation of the deal creation response from HubSpot
-type dealCreationResponse struct {
+// DealCreationResponse is a representation of the deal creation response from HubSpot
+type DealCreationResponse struct {
 	Id         string                         `json:"id"`
 	Properties dealCreationResponseProperties `json:"properties"`
 	CreatedAt  string                         `json:"createdAt"`
@@ -143,7 +143,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	contactID string,
 	companyID string,
 	applicationId string,
-) (*dealCreationResponse, error) {
+) (*DealCreationResponse, error) {
 
 	log.Infof("Creating a deal flow card")
 
@@ -199,7 +199,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 		return nil, err
 	}
 
-	var hubspotResp dealCreationResponse
+	var hubspotResp DealCreationResponse
 
 	log.Infof("Raw response: %s", string(body))
 	err = json.Unmarshal(body, &hubspotResp)

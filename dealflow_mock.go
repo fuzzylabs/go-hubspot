@@ -20,7 +20,7 @@ var _ IHubspotDealFlowAPI = &IHubspotDealFlowAPIMock{}
 // 			AssociateDealFlowCardFunc: func(dealId string, assocId string, assocType CardAssociation) error {
 // 				panic("mock out the AssociateDealFlowCard method")
 // 			},
-// 			CreateDealFlowCardFunc: func(cardName string, contactID string, companyID string, applicationId string) (*dealCreationResponse, error) {
+// 			CreateDealFlowCardFunc: func(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error) {
 // 				panic("mock out the CreateDealFlowCard method")
 // 			},
 // 			UpdateDealFlowCardFunc: func(dealId string, dealName string, dealStage string, applicationId string, dealValidationCheckFinished bool) error {
@@ -40,7 +40,7 @@ type IHubspotDealFlowAPIMock struct {
 	AssociateDealFlowCardFunc func(dealId string, assocId string, assocType CardAssociation) error
 
 	// CreateDealFlowCardFunc mocks the CreateDealFlowCard method.
-	CreateDealFlowCardFunc func(cardName string, contactID string, companyID string, applicationId string) (*dealCreationResponse, error)
+	CreateDealFlowCardFunc func(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error)
 
 	// UpdateDealFlowCardFunc mocks the UpdateDealFlowCard method.
 	UpdateDealFlowCardFunc func(dealId string, dealName string, dealStage string, applicationId string, dealValidationCheckFinished bool) error
@@ -137,7 +137,7 @@ func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCardCalls() []struct {
 }
 
 // CreateDealFlowCard calls CreateDealFlowCardFunc.
-func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCard(cardName string, contactID string, companyID string, applicationId string) (*dealCreationResponse, error) {
+func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCard(cardName string, contactID string, companyID string, applicationId string) (*DealCreationResponse, error) {
 	if mock.CreateDealFlowCardFunc == nil {
 		panic("IHubspotDealFlowAPIMock.CreateDealFlowCardFunc: method is nil but IHubspotDealFlowAPI.CreateDealFlowCard was just called")
 	}
