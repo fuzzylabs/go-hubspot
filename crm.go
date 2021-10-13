@@ -27,19 +27,19 @@ type HubSpotContactSearchResponse struct {
 	Results []ContactResult `json:"results"`
 }
 
-type association struct {
+type Association struct {
 	Id              string `json:"id"`
 	AssociationType string `json:"type"`
 }
 
-type associations struct {
-	Results []association `json:"results"`
+type Associations struct {
+	Results []Association `json:"results"`
 }
 
 type ContactResult struct {
 	Id           string                  `json:"id"`
 	Properties   map[string]string       `json:"properties"`
-	Associations map[string]associations `json:"associations"`
+	Associations map[string]Associations `json:"associations"`
 }
 
 type filter struct {
@@ -183,7 +183,7 @@ func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 
 	log.Infof("Raw response: %s", string(body))
 
-	var associationResp associations
+	var associationResp Associations
 	err = json.Unmarshal(body, &associationResp)
 	if err != nil {
 		return "", err

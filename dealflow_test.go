@@ -112,7 +112,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 							map[string]string{
 								"company_number": "companyNumber",
 							},
-							map[string]associations{},
+							map[string]Associations{},
 						},
 					},
 				}
@@ -135,9 +135,9 @@ func TestCreateDealFlowCard(t *testing.T) {
 					map[string]string{
 						"company_number": "companyNumber",
 					},
-					map[string]associations{
+					map[string]Associations{
 						"companies": {
-							[]association{
+							[]Association{
 								{
 									"companyId",
 									"type",

@@ -177,15 +177,15 @@ func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientM
 
 				w.WriteHeader(200)
 
-				assocs := make([]association, numberOfResults)
+				assocs := make([]Association, numberOfResults)
 				for i := 0; i < numberOfResults; i++ {
-					assocs[i] = association{fmt.Sprintf("id%d", i), "type"}
+					assocs[i] = Association{fmt.Sprintf("id%d", i), "type"}
 				}
 
 				response := ContactResult{
 					"id",
 					map[string]string{},
-					map[string]associations{
+					map[string]Associations{
 						"companies": {
 							assocs,
 						},
@@ -281,12 +281,12 @@ func createDealForCompanyMock(t *testing.T, numberOfResults int) IHTTPClientMock
 
 				w.WriteHeader(200)
 
-				assocs := make([]association, numberOfResults)
+				assocs := make([]Association, numberOfResults)
 				for i := 0; i < numberOfResults; i++ {
-					assocs[i] = association{fmt.Sprintf("id%d", i), "type"}
+					assocs[i] = Association{fmt.Sprintf("id%d", i), "type"}
 				}
 
-				response := associations{assocs}
+				response := Associations{assocs}
 
 				respBody, err := json.Marshal(response)
 				if err != nil {
