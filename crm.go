@@ -14,7 +14,7 @@ type IHubspotCRMAPI interface {
 	UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error
 	GetCompanyForContact(contactID string) (string, error)
 	GetDealForCompany(companyID string) (string, error)
-	GetContactID(applicationId string, companyNumber string) (string, error)
+	SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error)
 }
 
 type HubspotCRMAPI struct {
