@@ -21,11 +21,11 @@ var _ IHubspotCRMAPI = &IHubspotCRMAPIMock{}
 // 			GetCompanyForContactFunc: func(contactID string) (string, error) {
 // 				panic("mock out the GetCompanyForContact method")
 // 			},
-// 			GetContactIDFunc: func(applicationId string, companyNumber string) (string, error) {
-// 				panic("mock out the GetContactID method")
-// 			},
 // 			GetDealForCompanyFunc: func(companyID string) (string, error) {
 // 				panic("mock out the GetDealForCompany method")
+// 			},
+// 			SearchContactsFunc: func(filterMap map[string]string, properties []string) ([]ContactResult, error) {
+// 				panic("mock out the SearchContacts method")
 // 			},
 // 			UpdateCompanyFunc: func(companyID string, jsonPayload *bytes.Buffer) error {
 // 				panic("mock out the UpdateCompany method")
@@ -40,11 +40,11 @@ type IHubspotCRMAPIMock struct {
 	// GetCompanyForContactFunc mocks the GetCompanyForContact method.
 	GetCompanyForContactFunc func(contactID string) (string, error)
 
-	// GetContactIDFunc mocks the GetContactID method.
-	GetContactIDFunc func(applicationId string, companyNumber string) (string, error)
-
 	// GetDealForCompanyFunc mocks the GetDealForCompany method.
 	GetDealForCompanyFunc func(companyID string) (string, error)
+
+	// SearchContactsFunc mocks the SearchContacts method.
+	SearchContactsFunc func(filterMap map[string]string, properties []string) ([]ContactResult, error)
 
 	// UpdateCompanyFunc mocks the UpdateCompany method.
 	UpdateCompanyFunc func(companyID string, jsonPayload *bytes.Buffer) error
@@ -56,17 +56,17 @@ type IHubspotCRMAPIMock struct {
 			// ContactID is the contactID argument value.
 			ContactID string
 		}
-		// GetContactID holds details about calls to the GetContactID method.
-		GetContactID []struct {
-			// ApplicationId is the applicationId argument value.
-			ApplicationId string
-			// CompanyNumber is the companyNumber argument value.
-			CompanyNumber string
-		}
 		// GetDealForCompany holds details about calls to the GetDealForCompany method.
 		GetDealForCompany []struct {
 			// CompanyID is the companyID argument value.
 			CompanyID string
+		}
+		// SearchContacts holds details about calls to the SearchContacts method.
+		SearchContacts []struct {
+			// FilterMap is the filterMap argument value.
+			FilterMap map[string]string
+			// Properties is the properties argument value.
+			Properties []string
 		}
 		// UpdateCompany holds details about calls to the UpdateCompany method.
 		UpdateCompany []struct {
@@ -77,8 +77,8 @@ type IHubspotCRMAPIMock struct {
 		}
 	}
 	lockGetCompanyForContact sync.RWMutex
-	lockGetContactID         sync.RWMutex
 	lockGetDealForCompany    sync.RWMutex
+	lockSearchContacts       sync.RWMutex
 	lockUpdateCompany        sync.RWMutex
 }
 
@@ -113,41 +113,6 @@ func (mock *IHubspotCRMAPIMock) GetCompanyForContactCalls() []struct {
 	return calls
 }
 
-// GetContactID calls GetContactIDFunc.
-func (mock *IHubspotCRMAPIMock) GetContactID(applicationId string, companyNumber string) (string, error) {
-	if mock.GetContactIDFunc == nil {
-		panic("IHubspotCRMAPIMock.GetContactIDFunc: method is nil but IHubspotCRMAPI.GetContactID was just called")
-	}
-	callInfo := struct {
-		ApplicationId string
-		CompanyNumber string
-	}{
-		ApplicationId: applicationId,
-		CompanyNumber: companyNumber,
-	}
-	mock.lockGetContactID.Lock()
-	mock.calls.GetContactID = append(mock.calls.GetContactID, callInfo)
-	mock.lockGetContactID.Unlock()
-	return mock.GetContactIDFunc(applicationId, companyNumber)
-}
-
-// GetContactIDCalls gets all the calls that were made to GetContactID.
-// Check the length with:
-//     len(mockedIHubspotCRMAPI.GetContactIDCalls())
-func (mock *IHubspotCRMAPIMock) GetContactIDCalls() []struct {
-	ApplicationId string
-	CompanyNumber string
-} {
-	var calls []struct {
-		ApplicationId string
-		CompanyNumber string
-	}
-	mock.lockGetContactID.RLock()
-	calls = mock.calls.GetContactID
-	mock.lockGetContactID.RUnlock()
-	return calls
-}
-
 // GetDealForCompany calls GetDealForCompanyFunc.
 func (mock *IHubspotCRMAPIMock) GetDealForCompany(companyID string) (string, error) {
 	if mock.GetDealForCompanyFunc == nil {
@@ -176,6 +141,41 @@ func (mock *IHubspotCRMAPIMock) GetDealForCompanyCalls() []struct {
 	mock.lockGetDealForCompany.RLock()
 	calls = mock.calls.GetDealForCompany
 	mock.lockGetDealForCompany.RUnlock()
+	return calls
+}
+
+// SearchContacts calls SearchContactsFunc.
+func (mock *IHubspotCRMAPIMock) SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error) {
+	if mock.SearchContactsFunc == nil {
+		panic("IHubspotCRMAPIMock.SearchContactsFunc: method is nil but IHubspotCRMAPI.SearchContacts was just called")
+	}
+	callInfo := struct {
+		FilterMap  map[string]string
+		Properties []string
+	}{
+		FilterMap:  filterMap,
+		Properties: properties,
+	}
+	mock.lockSearchContacts.Lock()
+	mock.calls.SearchContacts = append(mock.calls.SearchContacts, callInfo)
+	mock.lockSearchContacts.Unlock()
+	return mock.SearchContactsFunc(filterMap, properties)
+}
+
+// SearchContactsCalls gets all the calls that were made to SearchContacts.
+// Check the length with:
+//     len(mockedIHubspotCRMAPI.SearchContactsCalls())
+func (mock *IHubspotCRMAPIMock) SearchContactsCalls() []struct {
+	FilterMap  map[string]string
+	Properties []string
+} {
+	var calls []struct {
+		FilterMap  map[string]string
+		Properties []string
+	}
+	mock.lockSearchContacts.RLock()
+	calls = mock.calls.SearchContacts
+	mock.lockSearchContacts.RUnlock()
 	return calls
 }
 
