@@ -31,16 +31,6 @@ type HubspotDealFlowAPI struct {
 	httpClient IHTTPClient
 }
 
-// dealCreationRequestProperties is a representation of the deal creation request to HubSpot
-//type dealCreationRequestProperties struct {
-//	DealName                string `json:"dealname"`
-//	DealStage               string `json:"dealstage"`
-//	Pipeline                string `json:"pipeline"`
-//	ApplicationId           string `json:"application_id"`
-//	HubspotOwnerId          string `json:"hubspot_owner_id"`
-//	ValidationCheckFinished string `json:"validation_check_finished"`
-//}
-
 // dealCreationRequest is a representation of the deal creation request to HubSpot
 type dealCreationRequest struct {
 	Properties map[string]string `json:"properties"`
@@ -65,13 +55,6 @@ type DealCreationResponse struct {
 	CreatedAt  string                         `json:"createdAt"`
 	UpdatedAt  string                         `json:"updatedAt"`
 	Archived   bool                           `json:"archived"`
-}
-
-type dealUpdateRequestProperties struct {
-	DealName                string `json:"dealname"`
-	DealStage               string `json:"dealstage"`
-	ApplicationId           string `json:"uuid"`
-	ValidationCheckFinished string `json:"validation_check_finished"`
 }
 
 type dealUpdateRequest struct {
@@ -237,49 +220,3 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 
 	return nil
 }
-
-//type dealUpdateValidationCheckDoneRequestProperties struct {
-//	ValidationCheckFinished string `json:"validation_check_finished"`
-//}
-//
-//type dealUpdateValidationCheckDoneRequest struct {
-//	Properties dealUpdateValidationCheckDoneRequestProperties `json:"properties"`
-//}
-//
-//// UpdateDealFlowCardValidationStatus updates the deal flow card attached to the given id with the given information
-//func (api HubspotDealFlowAPI) UpdateDealFlowCardValidationStatus(
-//	dealId string,
-//	dealValidationCheckFinished bool,
-//) error {
-//
-//	log.Infof("Updating a deal flow card")
-//
-//	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
-//
-//	strconv.FormatBool(dealValidationCheckFinished)
-//
-//	updateRequest := dealUpdateValidationCheckDoneRequest{
-//		dealUpdateValidationCheckDoneRequestProperties{
-//			strconv.FormatBool(dealValidationCheckFinished),
-//		},
-//	}
-//
-//	payloadBuf := new(bytes.Buffer)
-//	err := json.NewEncoder(payloadBuf).Encode(updateRequest)
-//	if err != nil {
-//		return err
-//	}
-//
-//	req, err := http.NewRequest("PATCH", url, payloadBuf)
-//	req.Header.Set("Content-Type", "application/json")
-//	if err != nil {
-//		return err
-//	}
-//
-//	_, err = api.httpClient.Do(req)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
