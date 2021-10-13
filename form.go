@@ -12,7 +12,7 @@ import (
 type IHubspotFormAPI interface {
 	GetPageURL(after string) string
 	Query(after string) (*HubspotResponse, error)
-	SearchForApplicationID(applicationId string) (map[string]string, error)
+	SearchForKeyValue(key string, value string) (map[string]string, error)
 }
 
 // HubspotFormAPI is the structure to interact with Hubspot Form API
@@ -112,9 +112,9 @@ func (r HubspotResponse) GetNextAfter() (string, error) {
 	return "", errors.New("There is no next page")
 }
 
-// SearchForApplicationID searches for a submission on Hubspot for a given Application ID
-func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (map[string]string, error) {
-	log.Printf("Searching for submission with Application ID %s\n", applicationId)
+// SearchForKeyValue searches for a form submission on Hubspot for a given key-value pair
+func (api HubspotFormAPI) SearchForKeyValue(key string, value string) (map[string]string, error) {
+	log.Printf("Searching for submission with %s = %s\n", key, value)
 
 	after := ""
 
@@ -125,10 +125,10 @@ func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (map[stri
 			return nil, err
 		}
 
-		submissionMap, err := hubspotResp.GetByApplicationID(applicationId)
+		submissionMap, err := hubspotResp.GetByKeyValue(key, value)
 
 		if err != nil {
-			if err.Error() == fmt.Sprintf("Submission with applicationId `%s` not found", applicationId) {
+			if err.Error() == fmt.Sprintf("Submission with %s `%s` not found", key, value) {
 				after, err = hubspotResp.GetNextAfter()
 				if err != nil {
 					return nil, err
@@ -143,16 +143,16 @@ func (api HubspotFormAPI) SearchForApplicationID(applicationId string) (map[stri
 
 }
 
-// GetByApplicationID searches Hubspot results for a form with a given application ID
-func (r HubspotResponse) GetByApplicationID(applicationId string) (map[string]string, error) {
+// GetByKeyValue searches Hubspot results for a form with a given key-value pair
+func (r HubspotResponse) GetByKeyValue(key string, value string) (map[string]string, error) {
 	for _, result := range r.Results {
 		submission := GetSubmissionMap(result)
 
-		if submission["application_id"] == applicationId {
+		if submission[key] == value {
 			log.Printf("Found: %#v", submission)
 			return submission, nil
 		}
 	}
 
-	return nil, errors.New(fmt.Sprintf("Submission with applicationId `%s` not found", applicationId))
+	return nil, errors.New(fmt.Sprintf("Submission with %s `%s` not found", key, value))
 }

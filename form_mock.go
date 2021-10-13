@@ -23,8 +23,8 @@ var _ IHubspotFormAPI = &IHubspotFormAPIMock{}
 // 			QueryFunc: func(after string) (*HubspotResponse, error) {
 // 				panic("mock out the Query method")
 // 			},
-// 			SearchForApplicationIDFunc: func(applicationId string) (map[string]string, error) {
-// 				panic("mock out the SearchForApplicationID method")
+// 			SearchForKeyValueFunc: func(key string, value string) (map[string]string, error) {
+// 				panic("mock out the SearchForKeyValue method")
 // 			},
 // 		}
 //
@@ -39,8 +39,8 @@ type IHubspotFormAPIMock struct {
 	// QueryFunc mocks the Query method.
 	QueryFunc func(after string) (*HubspotResponse, error)
 
-	// SearchForApplicationIDFunc mocks the SearchForApplicationID method.
-	SearchForApplicationIDFunc func(applicationId string) (map[string]string, error)
+	// SearchForKeyValueFunc mocks the SearchForKeyValue method.
+	SearchForKeyValueFunc func(key string, value string) (map[string]string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -54,15 +54,17 @@ type IHubspotFormAPIMock struct {
 			// After is the after argument value.
 			After string
 		}
-		// SearchForApplicationID holds details about calls to the SearchForApplicationID method.
-		SearchForApplicationID []struct {
-			// ApplicationId is the applicationId argument value.
-			ApplicationId string
+		// SearchForKeyValue holds details about calls to the SearchForKeyValue method.
+		SearchForKeyValue []struct {
+			// Key is the key argument value.
+			Key string
+			// Value is the value argument value.
+			Value string
 		}
 	}
-	lockGetPageURL             sync.RWMutex
-	lockQuery                  sync.RWMutex
-	lockSearchForApplicationID sync.RWMutex
+	lockGetPageURL        sync.RWMutex
+	lockQuery             sync.RWMutex
+	lockSearchForKeyValue sync.RWMutex
 }
 
 // GetPageURL calls GetPageURLFunc.
@@ -127,33 +129,37 @@ func (mock *IHubspotFormAPIMock) QueryCalls() []struct {
 	return calls
 }
 
-// SearchForApplicationID calls SearchForApplicationIDFunc.
-func (mock *IHubspotFormAPIMock) SearchForApplicationID(applicationId string) (map[string]string, error) {
-	if mock.SearchForApplicationIDFunc == nil {
-		panic("IHubspotFormAPIMock.SearchForApplicationIDFunc: method is nil but IHubspotFormAPI.SearchForApplicationID was just called")
+// SearchForKeyValue calls SearchForKeyValueFunc.
+func (mock *IHubspotFormAPIMock) SearchForKeyValue(key string, value string) (map[string]string, error) {
+	if mock.SearchForKeyValueFunc == nil {
+		panic("IHubspotFormAPIMock.SearchForKeyValueFunc: method is nil but IHubspotFormAPI.SearchForKeyValue was just called")
 	}
 	callInfo := struct {
-		ApplicationId string
+		Key   string
+		Value string
 	}{
-		ApplicationId: applicationId,
+		Key:   key,
+		Value: value,
 	}
-	mock.lockSearchForApplicationID.Lock()
-	mock.calls.SearchForApplicationID = append(mock.calls.SearchForApplicationID, callInfo)
-	mock.lockSearchForApplicationID.Unlock()
-	return mock.SearchForApplicationIDFunc(applicationId)
+	mock.lockSearchForKeyValue.Lock()
+	mock.calls.SearchForKeyValue = append(mock.calls.SearchForKeyValue, callInfo)
+	mock.lockSearchForKeyValue.Unlock()
+	return mock.SearchForKeyValueFunc(key, value)
 }
 
-// SearchForApplicationIDCalls gets all the calls that were made to SearchForApplicationID.
+// SearchForKeyValueCalls gets all the calls that were made to SearchForKeyValue.
 // Check the length with:
-//     len(mockedIHubspotFormAPI.SearchForApplicationIDCalls())
-func (mock *IHubspotFormAPIMock) SearchForApplicationIDCalls() []struct {
-	ApplicationId string
+//     len(mockedIHubspotFormAPI.SearchForKeyValueCalls())
+func (mock *IHubspotFormAPIMock) SearchForKeyValueCalls() []struct {
+	Key   string
+	Value string
 } {
 	var calls []struct {
-		ApplicationId string
+		Key   string
+		Value string
 	}
-	mock.lockSearchForApplicationID.RLock()
-	calls = mock.calls.SearchForApplicationID
-	mock.lockSearchForApplicationID.RUnlock()
+	mock.lockSearchForKeyValue.RLock()
+	calls = mock.calls.SearchForKeyValue
+	mock.lockSearchForKeyValue.RUnlock()
 	return calls
 }

@@ -99,13 +99,13 @@ func TestGetByApplicationID(t *testing.T) {
 		Paging: nil,
 	}
 
-	_, err := response.GetByApplicationID("application_id")
+	_, err := response.GetByKeyValue("application_id", "application_id")
 
 	if err == nil || err.Error() != "Submission with applicationId `application_id` not found" {
 		t.Errorf("Expected application_id not found")
 	}
 
-	submission, err := response.GetByApplicationID("other-application_id")
+	submission, err := response.GetByKeyValue("application_id", "other-application_id")
 
 	if err != nil || submission == nil {
 		t.Errorf("Expected other-application_id found")
@@ -222,7 +222,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		httpClient:  &mockHubspotHTTPClient,
 	}
 
-	form, err := api.SearchForApplicationID("application_id1")
+	form, err := api.SearchForKeyValue("application_id", "application_id1")
 
 	if err != nil || form["application_id"] != "application_id1" || form["company"] != "company1" {
 		t.Errorf("Expected to find form with application_id1 on page 1")
@@ -232,7 +232,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		t.Errorf("Expected 1 call to HubSpot API")
 	}
 
-	form, err = api.SearchForApplicationID("application_id2")
+	form, err = api.SearchForKeyValue("application_id", "application_id2")
 
 	if err != nil || form["application_id"] != "application_id2" || form["company"] != "company2" {
 		t.Errorf("Expected to find form with application_id2 on page 2")
@@ -242,7 +242,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		t.Errorf("Expected 2 call to HubSpot API")
 	}
 
-	form, err = api.SearchForApplicationID("none")
+	form, err = api.SearchForKeyValue("application_id", "none")
 
 	if err == nil {
 		t.Errorf("Expected to not find form with application_id=none")
