@@ -28,6 +28,53 @@ import (
 )
 ```
 
+## Examples
+Search for form submissions with the first name John:
+```go
+package main
+
+import (
+	hubspot "github.com/fuzzylabs/ehe-hubspot"
+)
+
+func main() {
+	api := hubspot.NewHubspotFormAPI("form-id", "hapikey")
+	_, _ = api.SearchForKeyValue("firstname", "John")
+}
+```
+
+Get company ID associated with a contact:
+```go
+package main
+
+import (
+	hubspot "github.com/fuzzylabs/ehe-hubspot"
+)
+
+func main() {
+	api := hubspot.NewHubspotCRMAPI("hapikey")
+	_, _ = api.GetCompanyForContact("123456")
+}
+```
+
+Update move a DealFlow card to another column (i.e. update its `dealstage` property):
+```go
+package main
+
+import (
+	hubspot "github.com/fuzzylabs/ehe-hubspot"
+)
+
+func main() {
+	api := hubspot.NewHubspotDealFlowAPI("hapikey")
+	_ = api.UpdateDealFlowCard(
+		"123456",
+		map[string]string{
+			"dealstage": "another-stage",
+        },
+    )
+}
+```
 ## Mocking
 `moq` is used to generate mocks:
 * Mocks for external interfaces to use within unit tests
