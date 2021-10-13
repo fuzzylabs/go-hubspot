@@ -126,15 +126,23 @@ func generateContactMock(t *testing.T, response []byte) IHTTPClientMock {
 	}
 }
 
-// searchContactsForApplicationIdTest runs a test on searchContactsForApplicationId
+// searchContactsForApplicationIdTest runs a test on SearchContacts
 // with a given response from the api and an expected result
 func searchContactsForApplicationIdTest(t *testing.T, response []byte, expectedContactIDs []string) {
 	mockHubSpotHTTPClient := generateContactMock(t, response)
 
 	api := getMockCRMAPI(&mockHubSpotHTTPClient)
-	gotResult, err := api.searchContactsForApplicationId("example-application-id")
+	gotResult, err := api.SearchContacts(
+		map[string]string{
+			"application_id": "example-application-id",
+		},
+		[]string{
+			"contact_id",
+			"company_number",
+		},
+	)
 	if err != nil {
-		t.Errorf("searchContactsForApplicationId failed; %s", err.Error())
+		t.Errorf("SearchContacts failed; %s", err.Error())
 	}
 
 	if len(gotResult) != len(expectedContactIDs) {
@@ -147,73 +155,8 @@ func searchContactsForApplicationIdTest(t *testing.T, response []byte, expectedC
 
 	for i, _ := range gotResult {
 		if gotResult[i].Id != expectedContactIDs[i] {
-			t.Errorf("searchContactsForApplicationId returned incorrect contact IDs, expected:\n%s\ngot:\n%s\n", expectedContactIDs, gotResult)
+			t.Errorf("SearchContacts returned incorrect contact IDs, expected:\n%s\ngot:\n%s\n", expectedContactIDs, gotResult)
 		}
-	}
-}
-
-func TestGetContactID(t *testing.T) {
-
-	// Test with 1 contact returned
-	mockHubSpotHTTPClient := generateContactMock(t, singleContactResponse)
-	api := getMockCRMAPI(&mockHubSpotHTTPClient)
-
-	result, err := api.GetContactID("example-application-id", "11762819")
-	if err != nil {
-		t.Errorf("searchContactsForApplicationId failed with one contact; %s", err.Error())
-	}
-	if result != "123id" {
-		t.Errorf("Got unexpected ID from GetContactID, expected 123id, got %s", result)
-	}
-
-	// Test with 1 contact returned with incorrect company number
-	mockHubSpotHTTPClient = generateContactMock(t, singleContactResponse)
-	api = getMockCRMAPI(&mockHubSpotHTTPClient)
-
-	result, err = api.GetContactID("example-application-id", "87654321")
-	expectedError := "Contact with application ID 'example-application-id' has company number '11762819', but we expected '87654321'"
-	if err.Error() != expectedError {
-		t.Errorf(`GetContactID did not fail with correct error for incorrect company number.
-		%s
-		got:
-		%s`, expectedError, err.Error())
-	}
-
-	if len(mockHubSpotHTTPClient.DoCalls()) != 1 {
-		t.Errorf("Expected 1 call to HubSpot API")
-	}
-
-	// Test with no contacts returned
-	mockHubSpotHTTPClient = generateContactMock(t, noContactResponse)
-	api = getMockCRMAPI(&mockHubSpotHTTPClient)
-
-	result, err = api.GetContactID("example-application-id", "11762819")
-	expectedError = "Could not find a contact with application ID 'example-application-id'"
-	if err.Error() != expectedError {
-		t.Errorf(`GetContactID did not fail with correct error for no retrieved contacts, expected:
-		%s
-		got:
-		%s`, expectedError, err.Error())
-	}
-
-	if len(mockHubSpotHTTPClient.DoCalls()) != 1 {
-		t.Errorf("Expected 1 call to HubSpot API")
-	}
-
-	// Test with multiple contacts returned
-	mockHubSpotHTTPClient = generateContactMock(t, multipleContactResponse)
-	api = getMockCRMAPI(&mockHubSpotHTTPClient)
-
-	result, err = api.GetContactID("example-application-id", "11762819")
-	if err.Error() != "Multiple contacts found for application ID 'example-application-id' there should only be one" {
-		t.Errorf(`GetContactID did not fail with correct error for no retrieved contacts, expected:
-		Multiple contacts found for application ID 'example-application-id' there should only be one
-		got:
-		%s`, err.Error())
-	}
-
-	if len(mockHubSpotHTTPClient.DoCalls()) != 1 {
-		t.Errorf("Expected 1 call to HubSpot API")
 	}
 }
 

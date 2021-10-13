@@ -200,26 +200,27 @@ func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 	}
 }
 
-// searchContactsForApplicationId searches for contacts with the given application ID and returns every result it finds
-func (api HubspotCRMAPI) searchContactsForApplicationId(application_id string) ([]ContactResult, error) {
+// SearchContacts searches for contacts with the provided filters and returns properties for the results found
+func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error) {
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", api.APIKey)
+
+	var filters = make([]filter, len(filterMap))
+	filterIndex := 0
+	for propertyName, value := range filterMap {
+		filters[filterIndex] = filter{
+			Value:        value,
+			PropertyName: propertyName,
+			Operator:     "EQ",
+		}
+	}
 
 	searchQuery := hubSpotSearchRequest{
 		FilterGroups: []filterGroup{
 			{
-				Filters: []filter{
-					{
-						Value:        application_id,
-						PropertyName: "application_id",
-						Operator:     "EQ",
-					},
-				},
+				Filters: filters,
 			},
 		},
-		Properties: []string{
-			"contact_id",
-			"company_number",
-		},
+		Properties: properties,
 	}
 
 	log.Infof("Making query to contact search endpoint (%s) with: %#v", url, searchQuery)
@@ -261,24 +262,4 @@ func (api HubspotCRMAPI) searchContactsForApplicationId(application_id string) (
 	}
 
 	return hubspotResp.Results, nil
-}
-
-// GetContactID searches for contacts on HubSpot with a specific company number
-func (api HubspotCRMAPI) GetContactID(applicationId string, companyNumber string) (string, error) {
-	contacts, err := api.searchContactsForApplicationId(applicationId)
-	if err != nil {
-		return "", err
-	}
-
-	if len(contacts) == 0 {
-		return "", errors.New(fmt.Sprintf("Could not find a contact with application ID '%s'", applicationId))
-	} else if len(contacts) > 1 {
-		return "", errors.New(fmt.Sprintf("Multiple contacts found for application ID '%s' there should only be one", applicationId))
-	} else {
-		contact := contacts[0]
-		if contact.Properties["company_number"] != companyNumber {
-			return "", errors.New(fmt.Sprintf("Contact with application ID '%s' has company number '%s', but we expected '%s'", applicationId, contact.Properties["company_number"], companyNumber))
-		}
-		return contact.Id, nil
-	}
 }
