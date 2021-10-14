@@ -1,4 +1,4 @@
-module github.com/fuzzylabs/ehe-hubspot
+module github.com/fuzzylabs/go-hubspot
 
 go 1.13
 
