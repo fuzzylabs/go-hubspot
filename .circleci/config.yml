@@ -1,0 +1,30 @@
+version: 2.1
+
+executors:
+  go:
+    docker:
+      - image: cimg/go:1.13
+
+commands: {}
+
+jobs:
+  ## Generic Jobs
+  test-go:
+    executor: go
+    working_directory: ~/project
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Unit Test
+          command: |
+            go vet
+            go test -cover
+
+# Workflows determine the order of the defined jobs.
+workflows:
+  version: 2
+
+  library:
+    jobs:
+      - test-go
