@@ -6,25 +6,25 @@ This library provides generic methods for the interation with HubSpot [Forms](ht
 You can install the module directly from GitHub
 
 ```shell
-go get -u github.com/fuzzylabs/ehe-hubspot@<version>
+go get -u github.com/fuzzylabs/go-hubspot@<version>
 ```
 
 Where version can point to a commit hash or a branch, for example:
 
 ```shell
-go get -u github.com/fuzzylabs/ehe-hubspot@9302e1d
+go get -u github.com/fuzzylabs/go-hubspot@9302e1d
 ```
 
 or 
 
 ```shell
-go get -u github.com/fuzzylabs/ehe-hubspot@master
+go get -u github.com/fuzzylabs/go-hubspot@master
 ```
 
 You can then import the library as follows:
 ```go
 import (
-	hubspot "github.com/fuzzylabs/ehe-hubspot"
+	hubspot "github.com/fuzzylabs/go-hubspot"
 )
 ```
 
@@ -34,7 +34,7 @@ Search for form submissions with the first name John:
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/ehe-hubspot"
+	hubspot "github.com/fuzzylabs/go-hubspot"
 )
 
 func main() {
@@ -48,7 +48,7 @@ Get company ID associated with a contact:
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/ehe-hubspot"
+	hubspot "github.com/fuzzylabs/go-hubspot"
 )
 
 func main() {
@@ -62,7 +62,7 @@ Update move a DealFlow card to another column (i.e. update its `dealstage` prope
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/ehe-hubspot"
+	hubspot "github.com/fuzzylabs/go-hubspot"
 )
 
 func main() {
@@ -78,7 +78,7 @@ func main() {
 ## Mocking
 `moq` is used to generate mocks:
 * Mocks for external interfaces to use within unit tests
-* Mocks for `ehe-hubspot` API interfaces, for to make testing of applications that use the library easier
+* Mocks for `go-hubspot` API interfaces, for to make testing of applications that use the library easier
 
 ```
 go generate
