@@ -65,7 +65,7 @@ func NewHubspotCRMAPI(apiKey string) HubspotCRMAPI {
 	}
 }
 
-// UpdateCompany updates company details in HubSpot CRM with companiesHouse record
+// UpdateCompany updates company details in HubSpot CRM
 func (api HubspotCRMAPI) UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error {
 	url := fmt.Sprintf(
 		"https://api.hubapi.com/crm/v3/objects/companies/%s?hapikey=%s",
