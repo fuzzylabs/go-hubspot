@@ -53,7 +53,7 @@ type FileUploadOptions struct {
 	DuplicateValidationScope    string `json:"duplicateValidationScope"`
 }
 
-// SearchForKeyValue searches for a form submission on Hubspot for a given key-value pair
+// TODO
 func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (string, error) {
 	var data bytes.Buffer
 	w := multipart.NewWriter(&data)
@@ -90,6 +90,11 @@ func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (
 		return "", errors.New(fmt.Sprintf("Error while writing options: %s", err.Error()))
 	}
 
+	err = w.Close()
+	if err != nil {
+		return "", err
+	}
+
 	req, err := http.NewRequest("POST", api.GetPageURL(), &data)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("Error while constructing a request: %s", err.Error()))
@@ -102,17 +107,21 @@ func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (
 		return "", errors.New(fmt.Sprintf("Error while making a request: %s", err.Error()))
 	}
 
+	if resp.StatusCode != 201 {
+		return "", errors.New(fmt.Sprintf("Request to HubSpot File API failed: %s", resp.Status))
+	}
+
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", errors.New(fmt.Sprintf("Error while reading response body: %s", err.Error()))
 	}
 
 	var hubspotResp FileUploadResponse
 	err = json.Unmarshal(body, &hubspotResp)
 	if err != nil {
-		return "", err
+		return "", errors.New(fmt.Sprintf("Error while unmarshaling HubSpot response: %s", err.Error()))
 	}
 
 	url := fmt.Sprintf(
