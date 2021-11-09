@@ -1,12 +1,13 @@
 package ehe_hubspot
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
-
-	log "github.com/sirupsen/logrus"
+	"mime/multipart"
+	"net/http"
 )
 
 type IHubspotFileAPI interface {
@@ -18,43 +19,87 @@ type IHubspotFileAPI interface {
 type HubspotFileAPI struct {
 	URLTemplate string
 	APIKey      string
+	PortalID    string
 	httpClient  IHTTPClient
 }
 
-// HubspotResponse response of the file API
+// FileUploadResponse response of the file API
 type FileUploadResponse struct {
-	Results []Submission `json:"results"`
-	Paging  *Paging      `json:"paging"`
+	Id string `json:"id"`
 }
 
-// NewHubspotFormAPI creates new HubspotFormAPI with form ID and API key
-func NewHubspotFormAPI(formID string, apiKey string) HubspotFormAPI {
-	return HubspotFormAPI{
+// NewHubspotFileAPI creates new HubspotFileAPI and API key
+func NewHubspotFileAPI(apiKey string, portalId string) HubspotFileAPI {
+	return HubspotFileAPI{
 		URLTemplate: "https://api.hubapi.com/files/v3/files?hapikey=%s",
 		APIKey:      apiKey,
+		PortalID:    portalId,
 		httpClient:  HTTPClient{},
 	}
 }
 
 // GetPageURL gets query URL for a page of results
-func (api HubspotFormAPI) GetPageURL() string {
+func (api HubspotFileAPI) GetPageURL() string {
 	return fmt.Sprintf(
 		api.URLTemplate,
 		api.APIKey,
 	)
 }
 
+type FileUploadOptions struct {
+	Access                      string `json:"access"`
+	Overwrite                   bool   `json:"overwrite"`
+	DuplicateValidationStrategy string `json:"duplicateValidationStrategy"`
+	DuplicateValidationScope    string `json:"duplicateValidationScope"`
+}
+
 // SearchForKeyValue searches for a form submission on Hubspot for a given key-value pair
-func (api HubspotFileAPI) UploadFile(file , folderPath, fileName, options string) error {
-	log.Printf("Uploading file to HubSpot")
+func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (string, error) {
+	var data bytes.Buffer
+	w := multipart.NewWriter(&data)
 
-	req, _ := http.NewRequest("POST", api.GetPageURL(), jsonPayload)
+	fileWriter, err := w.CreateFormFile("file", fileName)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while creating a file writer: %s", err.Error()))
+	}
 
-	req.Header.Set("Content-Type", "application/json")
+	_, err = fileWriter.Write(file)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while writing a file: %s", err.Error()))
+	}
+
+	err = w.WriteField("folderPath", folderPath)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while writing folder name: %s", err.Error()))
+	}
+
+	options := FileUploadOptions{
+		Access:                      "PRIVATE",
+		Overwrite:                   true,
+		DuplicateValidationStrategy: "NONE",
+		DuplicateValidationScope:    "EXACT_FOLDER",
+	}
+
+	optionsBytes, err := json.Marshal(options)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while marshaling options: %s", err.Error()))
+	}
+
+	err = w.WriteField("options", string(optionsBytes))
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while writing options: %s", err.Error()))
+	}
+
+	req, err := http.NewRequest("POST", api.GetPageURL(), &data)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while constructing a request: %s", err.Error()))
+	}
+
+	req.Header.Set("Content-Type", w.FormDataContentType())
 
 	resp, err := api.httpClient.Do(req)
 	if err != nil {
-		return "", nil
+		return "", errors.New(fmt.Sprintf("Error while making a request: %s", err.Error()))
 	}
 
 	defer resp.Body.Close()
@@ -70,4 +115,11 @@ func (api HubspotFileAPI) UploadFile(file , folderPath, fileName, options string
 		return "", err
 	}
 
+	url := fmt.Sprintf(
+		"https://api.hubspot.com/filemanager/api/v2/files/%s/signed-url-redirect?portalId=%s",
+		hubspotResp.Id,
+		api.PortalID,
+	)
+
+	return url, nil
 }
