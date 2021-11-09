@@ -1,4 +1,4 @@
-package ehe_hubspot
+package go_hubspot
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// getDealFlowAPI Get default HubSpot Form API client
+// getFormAPI Get default HubSpot Form API client
 func getFormAPI() HubspotFormAPI {
 	return NewHubspotFormAPI("form", "key")
 }

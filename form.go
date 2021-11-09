@@ -1,4 +1,4 @@
-package ehe_hubspot
+package go_hubspot
 
 import (
 	"encoding/json"
