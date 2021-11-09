@@ -75,10 +75,25 @@ func main() {
     )
 }
 ```
+
+Upload a file to the HubSpot CRM
+```go
+package main
+
+import (
+	hubspot "github.com/fuzzylabs/go-hubspot"
+)
+
+func main() {
+	fileApi := hubspot.NewHubspotFileAPI("hapikey", "portalId")
+	fileUrl, err := fileApi.UploadFile(bytes, "folder path", "file name")
+}
+```
+
 ## Mocking
 `moq` is used to generate mocks:
 * Mocks for external interfaces to use within unit tests
-* Mocks for `go-hubspot` API interfaces, for to make testing of applications that use the library easier
+* Mocks for `go-hubspot` API interfaces, to make testing of applications that use the library easier
 
 ```
 go generate
