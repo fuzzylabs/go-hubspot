@@ -125,9 +125,9 @@ func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (
 	}
 
 	url := fmt.Sprintf(
-		"https://api.hubspot.com/filemanager/api/v2/files/%s/signed-url-redirect?portalId=%s",
-		hubspotResp.Id,
+		"https://app.hubspot.com/file-preview/%s/file/%s",
 		api.PortalID,
+		hubspotResp.Id,
 	)
 
 	return url, nil
