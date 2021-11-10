@@ -20,7 +20,7 @@ var _ IHubspotFileAPI = &IHubspotFileAPIMock{}
 // 			GetPageURLFunc: func() string {
 // 				panic("mock out the GetPageURL method")
 // 			},
-// 			UploadFileFunc: func(file string, folderPath string, fileName string, options string) error {
+// 			UploadFileFunc: func(file string, folderPath string, fileName string) error {
 // 				panic("mock out the UploadFile method")
 // 			},
 // 		}
@@ -34,7 +34,7 @@ type IHubspotFileAPIMock struct {
 	GetPageURLFunc func() string
 
 	// UploadFileFunc mocks the UploadFile method.
-	UploadFileFunc func(file string, folderPath string, fileName string, options string) error
+	UploadFileFunc func(file string, folderPath string, fileName string) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -49,8 +49,6 @@ type IHubspotFileAPIMock struct {
 			FolderPath string
 			// FileName is the fileName argument value.
 			FileName string
-			// Options is the options argument value.
-			Options string
 		}
 	}
 	lockGetPageURL sync.RWMutex
@@ -84,7 +82,7 @@ func (mock *IHubspotFileAPIMock) GetPageURLCalls() []struct {
 }
 
 // UploadFile calls UploadFileFunc.
-func (mock *IHubspotFileAPIMock) UploadFile(file string, folderPath string, fileName string, options string) error {
+func (mock *IHubspotFileAPIMock) UploadFile(file string, folderPath string, fileName string) error {
 	if mock.UploadFileFunc == nil {
 		panic("IHubspotFileAPIMock.UploadFileFunc: method is nil but IHubspotFileAPI.UploadFile was just called")
 	}
@@ -92,17 +90,15 @@ func (mock *IHubspotFileAPIMock) UploadFile(file string, folderPath string, file
 		File       string
 		FolderPath string
 		FileName   string
-		Options    string
 	}{
 		File:       file,
 		FolderPath: folderPath,
 		FileName:   fileName,
-		Options:    options,
 	}
 	mock.lockUploadFile.Lock()
 	mock.calls.UploadFile = append(mock.calls.UploadFile, callInfo)
 	mock.lockUploadFile.Unlock()
-	return mock.UploadFileFunc(file, folderPath, fileName, options)
+	return mock.UploadFileFunc(file, folderPath, fileName)
 }
 
 // UploadFileCalls gets all the calls that were made to UploadFile.
@@ -112,13 +108,11 @@ func (mock *IHubspotFileAPIMock) UploadFileCalls() []struct {
 	File       string
 	FolderPath string
 	FileName   string
-	Options    string
 } {
 	var calls []struct {
 		File       string
 		FolderPath string
 		FileName   string
-		Options    string
 	}
 	mock.lockUploadFile.RLock()
 	calls = mock.calls.UploadFile
