@@ -12,7 +12,7 @@ import (
 
 type IHubspotFileAPI interface {
 	GetPageURL() string
-	UploadFile(file, folderPath, fileName string) error
+	UploadFile(file []byte, folderPath, fileName string) (string, error)
 }
 
 // HubspotFileAPI is the structure to interact with Hubspot File API
