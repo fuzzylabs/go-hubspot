@@ -53,7 +53,6 @@ type FileUploadOptions struct {
 	DuplicateValidationScope    string `json:"duplicateValidationScope"`
 }
 
-// TODO
 func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (string, error) {
 	var data bytes.Buffer
 	w := multipart.NewWriter(&data)
