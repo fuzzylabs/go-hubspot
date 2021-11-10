@@ -1,9 +1,14 @@
 # Go HubSpot library
 
-This library provides generic methods for interaction with HubSpot [Forms](https://legacydocs.hubspot.com/docs/methods/forms/forms_overview), CRM ([Contacts](https://developers.hubspot.com/docs/api/crm/contacts), [Companies](https://developers.hubspot.com/docs/api/crm/companies)) and [DealFlow](https://developers.hubspot.com/docs/api/crm/deals) APIs
+This library provides generic methods for interaction with HubSpot 
+[Forms](https://legacydocs.hubspot.com/docs/methods/forms/forms_overview),
+CRM ([Contacts](https://developers.hubspot.com/docs/api/crm/contacts),
+[Companies](https://developers.hubspot.com/docs/api/crm/companies)),
+[DealFlow](https://developers.hubspot.com/docs/api/crm/deals)
+and [File](https://developers.hubspot.com/docs/api/files/files) APIs.
 
 ## Usage
-You can install the module directly from GitHub
+You can install the module directly from GitHub.
 
 ```shell
 go get -u github.com/fuzzylabs/go-hubspot@<version>
