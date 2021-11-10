@@ -20,7 +20,7 @@ var _ IHubspotFileAPI = &IHubspotFileAPIMock{}
 // 			GetPageURLFunc: func() string {
 // 				panic("mock out the GetPageURL method")
 // 			},
-// 			UploadFileFunc: func(file string, folderPath string, fileName string) error {
+// 			UploadFileFunc: func(file []byte, folderPath string, fileName string) (string, error) {
 // 				panic("mock out the UploadFile method")
 // 			},
 // 		}
@@ -34,7 +34,7 @@ type IHubspotFileAPIMock struct {
 	GetPageURLFunc func() string
 
 	// UploadFileFunc mocks the UploadFile method.
-	UploadFileFunc func(file string, folderPath string, fileName string) error
+	UploadFileFunc func(file []byte, folderPath string, fileName string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,7 +44,7 @@ type IHubspotFileAPIMock struct {
 		// UploadFile holds details about calls to the UploadFile method.
 		UploadFile []struct {
 			// File is the file argument value.
-			File string
+			File []byte
 			// FolderPath is the folderPath argument value.
 			FolderPath string
 			// FileName is the fileName argument value.
@@ -82,12 +82,12 @@ func (mock *IHubspotFileAPIMock) GetPageURLCalls() []struct {
 }
 
 // UploadFile calls UploadFileFunc.
-func (mock *IHubspotFileAPIMock) UploadFile(file string, folderPath string, fileName string) error {
+func (mock *IHubspotFileAPIMock) UploadFile(file []byte, folderPath string, fileName string) (string, error) {
 	if mock.UploadFileFunc == nil {
 		panic("IHubspotFileAPIMock.UploadFileFunc: method is nil but IHubspotFileAPI.UploadFile was just called")
 	}
 	callInfo := struct {
-		File       string
+		File       []byte
 		FolderPath string
 		FileName   string
 	}{
@@ -105,12 +105,12 @@ func (mock *IHubspotFileAPIMock) UploadFile(file string, folderPath string, file
 // Check the length with:
 //     len(mockedIHubspotFileAPI.UploadFileCalls())
 func (mock *IHubspotFileAPIMock) UploadFileCalls() []struct {
-	File       string
+	File       []byte
 	FolderPath string
 	FileName   string
 } {
 	var calls []struct {
-		File       string
+		File       []byte
 		FolderPath string
 		FileName   string
 	}
