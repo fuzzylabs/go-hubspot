@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
@@ -51,7 +51,7 @@ func TestUploadFile(t *testing.T) {
 					t.Errorf("Error unmarshalling request options to a FileUploadOptions struct: %s" + err.Error())
 				}
 
-				if !reflect.DeepEqual(expectedOptions, gotOptions) {
+				if !cmp.Equal(expectedOptions, gotOptions) {
 					t.Errorf("Unexpected options for file upload expected:\n %v\ngot:\n%v", expectedOptions, gotOptions)
 				}
 
@@ -66,7 +66,7 @@ func TestUploadFile(t *testing.T) {
 					return nil, err
 				}
 
-				if !reflect.DeepEqual(buf.Bytes(), fileContent) {
+				if !cmp.Equal(buf.Bytes(), fileContent) {
 					t.Errorf("Incorrect file information uploaded")
 				}
 
