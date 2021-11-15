@@ -1,9 +1,14 @@
 # Go HubSpot library
 
-This library provides generic methods for the interation with HubSpot [Forms](https://legacydocs.hubspot.com/docs/methods/forms/forms_overview), CRM ([Contacts](https://developers.hubspot.com/docs/api/crm/contacts) and [Companies](https://developers.hubspot.com/docs/api/crm/companies)) and [DealFlow](https://developers.hubspot.com/docs/api/crm/deals) APIs
+This library provides generic methods for interaction with HubSpot 
+[Forms](https://legacydocs.hubspot.com/docs/methods/forms/forms_overview),
+CRM ([Contacts](https://developers.hubspot.com/docs/api/crm/contacts),
+[Companies](https://developers.hubspot.com/docs/api/crm/companies)),
+[DealFlow](https://developers.hubspot.com/docs/api/crm/deals)
+and [File](https://developers.hubspot.com/docs/api/files/files) APIs.
 
 ## Usage
-You can install the module directly from GitHub
+You can install the module directly from GitHub.
 
 ```shell
 go get -u github.com/fuzzylabs/go-hubspot@<version>
@@ -75,10 +80,25 @@ func main() {
     )
 }
 ```
+
+Upload a file to the HubSpot CRM
+```go
+package main
+
+import (
+	hubspot "github.com/fuzzylabs/go-hubspot"
+)
+
+func main() {
+	fileApi := hubspot.NewHubspotFileAPI("hapikey", "portalId")
+	fileUrl, err := fileApi.UploadFile(bytes, "folder path", "file name")
+}
+```
+
 ## Mocking
 `moq` is used to generate mocks:
 * Mocks for external interfaces to use within unit tests
-* Mocks for `go-hubspot` API interfaces, for to make testing of applications that use the library easier
+* Mocks for `go-hubspot` API interfaces, to make testing of applications that use the library easier
 
 ```
 go generate
