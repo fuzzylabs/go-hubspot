@@ -187,6 +187,7 @@ func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 
 // SearchContacts searches for contacts with the provided filters and returns properties for the results found
 func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error) {
+	censoredUrl := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", "<censored>")
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", api.APIKey)
 
 	var filters = make([]filter, len(filterMap))
@@ -208,7 +209,7 @@ func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties 
 		Properties: properties,
 	}
 
-	log.Infof("Making query to contact search endpoint (%s) with: %#v", url, searchQuery)
+	log.Infof("Making query to contact search endpoint (%s) with: %#v", censoredUrl, searchQuery)
 
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(searchQuery)

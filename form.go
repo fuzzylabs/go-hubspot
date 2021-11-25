@@ -79,8 +79,6 @@ func (api HubspotFormAPI) GetPageURL(after string) string {
 func (api HubspotFormAPI) Query(after string) (*HubspotResponse, error) {
 	url := api.GetPageURL(after)
 
-	log.Println(url)
-
 	resp, err := api.httpClient.Get(url)
 	if err != nil {
 		return nil, err
