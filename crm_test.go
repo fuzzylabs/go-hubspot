@@ -168,7 +168,7 @@ func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientM
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			expectedUrl := "https://api.hubapi.com/crm/v3/objects/contacts/contactid?associations=company&archived=false&hapikey=api_key"
+			expectedUrl := "https://api.hubapi.com/crm/v3/objects/contacts/contactid/associations/company?hapikey=api_key"
 			if url == expectedUrl {
 
 				if req.Method != "GET" {
@@ -182,15 +182,7 @@ func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientM
 					assocs[i] = Association{fmt.Sprintf("id%d", i), "type"}
 				}
 
-				response := ContactResult{
-					"id",
-					map[string]string{},
-					map[string]Associations{
-						"companies": {
-							assocs,
-						},
-					},
-				}
+				response := Associations{assocs}
 
 				respBody, err := json.Marshal(response)
 				if err != nil {

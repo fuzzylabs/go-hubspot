@@ -107,7 +107,7 @@ func (api HubspotCRMAPI) UpdateCompany(companyID string, jsonPayload *bytes.Buff
 // If no company is found "" is returned, no error is thrown
 func (api HubspotCRMAPI) GetCompanyForContact(contactID string) (string, error) {
 	url := fmt.Sprintf(
-		"https://api.hubapi.com/crm/v3/objects/contacts/%s?associations=company&archived=false&hapikey=%s",
+		"https://api.hubapi.com/crm/v3/objects/contacts/%s/associations/company?hapikey=%s",
 		contactID,
 		api.APIKey,
 	)
@@ -126,13 +126,13 @@ func (api HubspotCRMAPI) GetCompanyForContact(contactID string) (string, error) 
 		return "", err
 	}
 
-	var hubspotResp ContactResult
+	var hubspotResp Associations
 	err = json.Unmarshal(body, &hubspotResp)
 	if err != nil {
 		return "", err
 	}
 
-	companies := hubspotResp.Associations["companies"].Results
+	companies := hubspotResp.Results
 
 	if len(companies) == 0 {
 		return "", nil
