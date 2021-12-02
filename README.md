@@ -26,6 +26,8 @@ or
 go get -u github.com/fuzzylabs/go-hubspot@master
 ```
 
+Note: specifying the branch will not update the import when updates are made to that branch.
+
 You can then import the library as follows:
 ```go
 import (
