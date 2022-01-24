@@ -154,8 +154,8 @@ func TestCreateDealFlowCard(t *testing.T) {
 				}
 			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
 				expectedRequest := DealAssociationBatchRequest{
@@ -194,8 +194,8 @@ func TestCreateDealFlowCard(t *testing.T) {
 				w.WriteHeader(200)
 			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
 				expectedRequest := DealAssociationBatchRequest{
@@ -289,8 +289,8 @@ func TestAssociateDealFlowCard(t *testing.T) {
 
 			if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
 				expectedRequest := DealAssociationBatchRequest{
@@ -327,8 +327,8 @@ func TestAssociateDealFlowCard(t *testing.T) {
 				w.WriteHeader(200)
 			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
 				expectedRequest := DealAssociationBatchRequest{

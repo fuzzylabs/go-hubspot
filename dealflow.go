@@ -109,7 +109,7 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", url, payloadBuf)
+	req, err := http.NewRequest("POST", url, payloadBuf)
 	if err != nil {
 		return err
 	}
