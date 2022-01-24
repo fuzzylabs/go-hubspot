@@ -64,17 +64,17 @@ type dealUpdateRequest struct {
 type CardAssociation int64
 
 type DealAssociationFromTo struct {
-	Id string
+	Id string `json:"id"`
 }
 
 type DealAssociation struct {
-	From DealAssociationFromTo
-	To   DealAssociationFromTo
-	Type string
+	From DealAssociationFromTo `json:"from"`
+	To   DealAssociationFromTo `json:"to"`
+	Type string                `json:"type"`
 }
 
 type DealAssociationBatchRequest struct {
-	Inputs []DealAssociation
+	Inputs []DealAssociation `json:"inputs"`
 }
 
 // NewHubspotDealFlowAPI creates new HubspotDealFlowAPI with form ID and API key
