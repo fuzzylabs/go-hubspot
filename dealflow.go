@@ -10,7 +10,7 @@ import (
 )
 
 type IHubspotDealFlowAPI interface {
-	AssociateDealFlowCard(dealId, assocId string, assocType CardAssociation) error
+	AssociateDealFlowCard(dealId, assocId, objectType, assocType string) error
 	CreateDealFlowCard(
 		cardName string,
 		contactID string,
@@ -87,7 +87,7 @@ func NewHubspotDealFlowAPI(apiKey string) HubspotDealFlowAPI {
 
 // AssociateDealFlowCard associates a deal flow card with a company or contact using the internal HubSpot dealId and companyId/contactId
 // Choose whether to associate a company or contact by setting assocType to "contact" or "company"
-func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId string, objectType string, assocType string) error {
+func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType, assocType string) error {
 	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/associations/deal/%s/batch/create?hapikey=%s",
 		objectType,
 		api.APIKey,

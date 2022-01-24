@@ -17,7 +17,7 @@ var _ IHubspotDealFlowAPI = &IHubspotDealFlowAPIMock{}
 //
 // 		// make and configure a mocked IHubspotDealFlowAPI
 // 		mockedIHubspotDealFlowAPI := &IHubspotDealFlowAPIMock{
-// 			AssociateDealFlowCardFunc: func(dealId string, assocId string, assocType CardAssociation) error {
+// 			AssociateDealFlowCardFunc: func(dealId string, assocId string, objectType string, assocType string) error {
 // 				panic("mock out the AssociateDealFlowCard method")
 // 			},
 // 			CreateDealFlowCardFunc: func(cardName string, contactID string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error) {
@@ -34,7 +34,7 @@ var _ IHubspotDealFlowAPI = &IHubspotDealFlowAPIMock{}
 // 	}
 type IHubspotDealFlowAPIMock struct {
 	// AssociateDealFlowCardFunc mocks the AssociateDealFlowCard method.
-	AssociateDealFlowCardFunc func(dealId string, assocId string, assocType CardAssociation) error
+	AssociateDealFlowCardFunc func(dealId string, assocId string, objectType string, assocType string) error
 
 	// CreateDealFlowCardFunc mocks the CreateDealFlowCard method.
 	CreateDealFlowCardFunc func(cardName string, contactID string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error)
@@ -50,8 +50,10 @@ type IHubspotDealFlowAPIMock struct {
 			DealId string
 			// AssocId is the assocId argument value.
 			AssocId string
+			// ObjectType is the objectType argument value.
+			ObjectType string
 			// AssocType is the assocType argument value.
-			AssocType CardAssociation
+			AssocType string
 		}
 		// CreateDealFlowCard holds details about calls to the CreateDealFlowCard method.
 		CreateDealFlowCard []struct {
@@ -84,37 +86,41 @@ type IHubspotDealFlowAPIMock struct {
 }
 
 // AssociateDealFlowCard calls AssociateDealFlowCardFunc.
-func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCard(dealId string, assocId string, assocType CardAssociation) error {
+func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCard(dealId string, assocId string, objectType string, assocType string) error {
 	if mock.AssociateDealFlowCardFunc == nil {
 		panic("IHubspotDealFlowAPIMock.AssociateDealFlowCardFunc: method is nil but IHubspotDealFlowAPI.AssociateDealFlowCard was just called")
 	}
 	callInfo := struct {
-		DealId    string
-		AssocId   string
-		AssocType CardAssociation
+		DealId     string
+		AssocId    string
+		ObjectType string
+		AssocType  string
 	}{
-		DealId:    dealId,
-		AssocId:   assocId,
-		AssocType: assocType,
+		DealId:     dealId,
+		AssocId:    assocId,
+		ObjectType: objectType,
+		AssocType:  assocType,
 	}
 	mock.lockAssociateDealFlowCard.Lock()
 	mock.calls.AssociateDealFlowCard = append(mock.calls.AssociateDealFlowCard, callInfo)
 	mock.lockAssociateDealFlowCard.Unlock()
-	return mock.AssociateDealFlowCardFunc(dealId, assocId, assocType)
+	return mock.AssociateDealFlowCardFunc(dealId, assocId, objectType, assocType)
 }
 
 // AssociateDealFlowCardCalls gets all the calls that were made to AssociateDealFlowCard.
 // Check the length with:
 //     len(mockedIHubspotDealFlowAPI.AssociateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCardCalls() []struct {
-	DealId    string
-	AssocId   string
-	AssocType CardAssociation
+	DealId     string
+	AssocId    string
+	ObjectType string
+	AssocType  string
 } {
 	var calls []struct {
-		DealId    string
-		AssocId   string
-		AssocType CardAssociation
+		DealId     string
+		AssocId    string
+		ObjectType string
+		AssocType  string
 	}
 	mock.lockAssociateDealFlowCard.RLock()
 	calls = mock.calls.AssociateDealFlowCard
