@@ -103,11 +103,19 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 		},
 	}
 
+	fmt.Printf("Association URL :%s\n", url)
+
+	bodyJSON, _ := json.Marshal(associationRequest)
+
+	fmt.Printf("Association Body:%s\n", bodyJSON)
+
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(associationRequest)
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("Payload Buffer  :%s\n", payloadBuf)
 
 	req, err := http.NewRequest("POST", url, payloadBuf)
 	if err != nil {
