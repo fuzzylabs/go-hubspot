@@ -37,8 +37,8 @@ type dealCreationRequest struct {
 	Properties map[string]string `json:"properties"`
 }
 
-// dealCreationResponseProperties is a representation of the deal creation response from HubSpot
-type dealCreationResponseProperties struct {
+// DealCreationResponseProperties is a representation of the deal creation response from HubSpot
+type DealCreationResponseProperties struct {
 	Amount             string `json:"amount"`
 	CloseDate          string `json:"closedate"`
 	CreateDate         string `json:"createdate"`
@@ -52,7 +52,7 @@ type dealCreationResponseProperties struct {
 // DealCreationResponse is a representation of the deal creation response from HubSpot
 type DealCreationResponse struct {
 	Id         string                         `json:"id"`
-	Properties dealCreationResponseProperties `json:"properties"`
+	Properties DealCreationResponseProperties `json:"properties"`
 	CreatedAt  string                         `json:"createdAt"`
 	UpdatedAt  string                         `json:"updatedAt"`
 	Archived   bool                           `json:"archived"`
