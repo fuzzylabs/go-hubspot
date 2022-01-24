@@ -14,6 +14,7 @@ type IHubspotDealFlowAPI interface {
 	CreateDealFlowCard(
 		cardName string,
 		contactID string,
+		contactAssocType string,
 		companyID string,
 		stageName string,
 		pipeline string,
@@ -103,19 +104,11 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 		},
 	}
 
-	fmt.Printf("Association URL :%s\n", url)
-
-	bodyJSON, _ := json.Marshal(associationRequest)
-
-	fmt.Printf("Association Body:%s\n", bodyJSON)
-
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(associationRequest)
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Payload Buffer  :%s\n", payloadBuf)
 
 	req, err := http.NewRequest("POST", url, payloadBuf)
 	if err != nil {
@@ -137,6 +130,7 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	cardName string,
 	contactID string,
+	contactAssocType string,
 	companyID string,
 	stageName string,
 	pipeline string,
@@ -200,7 +194,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	}
 
 	// Associate the deal with a contact based on the application id
-	err = api.AssociateDealFlowCard(hubspotResp.Id, contactID, "contact", "deal_to_contact")
+	err = api.AssociateDealFlowCard(hubspotResp.Id, contactID, "contact", contactAssocType)
 	if err != nil {
 		return nil, err
 	}

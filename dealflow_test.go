@@ -203,7 +203,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 						{
 							From: DealAssociationFromTo{Id: "dealId"},
 							To:   DealAssociationFromTo{Id: "contactId"},
-							Type: "deal_to_contact",
+							Type: "contactAssocType",
 						},
 					},
 				}
@@ -245,6 +245,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 	response, err := api.CreateDealFlowCard(
 		"cardName",
 		"contactId",
+		"contactAssocType",
 		"companyId",
 		"stageName",
 		"pipeline",
