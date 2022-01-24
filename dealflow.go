@@ -122,6 +122,8 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 		return err
 	}
 
+	req.Header.Set("Content-Type", "application/json")
+
 	_, err = api.httpClient.Do(req)
 	if err != nil {
 		return err
