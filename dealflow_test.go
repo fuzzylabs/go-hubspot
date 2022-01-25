@@ -24,7 +24,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 
 	expected := DealCreationResponse{
 		"dealId",
-		dealCreationResponseProperties{
+		DealCreationResponseProperties{
 			"Amount",
 			"CloseDate",
 			"CreateDate",
