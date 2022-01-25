@@ -10,10 +10,11 @@ import (
 )
 
 type IHubspotDealFlowAPI interface {
-	AssociateDealFlowCard(dealId, assocId string, assocType CardAssociation) error
+	AssociateDealFlowCard(dealId, assocId, objectType, assocType string) error
 	CreateDealFlowCard(
 		cardName string,
 		contactID string,
+		contactAssocType string,
 		companyID string,
 		stageName string,
 		pipeline string,
@@ -36,8 +37,8 @@ type dealCreationRequest struct {
 	Properties map[string]string `json:"properties"`
 }
 
-// dealCreationResponseProperties is a representation of the deal creation response from HubSpot
-type dealCreationResponseProperties struct {
+// DealCreationResponseProperties is a representation of the deal creation response from HubSpot
+type DealCreationResponseProperties struct {
 	Amount             string `json:"amount"`
 	CloseDate          string `json:"closedate"`
 	CreateDate         string `json:"createdate"`
@@ -51,7 +52,7 @@ type dealCreationResponseProperties struct {
 // DealCreationResponse is a representation of the deal creation response from HubSpot
 type DealCreationResponse struct {
 	Id         string                         `json:"id"`
-	Properties dealCreationResponseProperties `json:"properties"`
+	Properties DealCreationResponseProperties `json:"properties"`
 	CreatedAt  string                         `json:"createdAt"`
 	UpdatedAt  string                         `json:"updatedAt"`
 	Archived   bool                           `json:"archived"`
@@ -63,10 +64,19 @@ type dealUpdateRequest struct {
 
 type CardAssociation int64
 
-const (
-	Company CardAssociation = iota
-	Contact
-)
+type DealAssociationFromTo struct {
+	Id string `json:"id"`
+}
+
+type DealAssociation struct {
+	From DealAssociationFromTo `json:"from"`
+	To   DealAssociationFromTo `json:"to"`
+	Type string                `json:"type"`
+}
+
+type DealAssociationBatchRequest struct {
+	Inputs []DealAssociation `json:"inputs"`
+}
 
 // NewHubspotDealFlowAPI creates new HubspotDealFlowAPI with form ID and API key
 func NewHubspotDealFlowAPI(apiKey string) HubspotDealFlowAPI {
@@ -76,31 +86,36 @@ func NewHubspotDealFlowAPI(apiKey string) HubspotDealFlowAPI {
 	}
 }
 
-// AssociateDealFlowCard associates a deal flow card with a company or contact using the internal HubSpot dealId and companyId/contactid
+// AssociateDealFlowCard associates a deal flow card with a company or contact using the internal HubSpot dealId and companyId/contactId
 // Choose whether to associate a company or contact by setting assocType to "contact" or "company"
-func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId string, assocType CardAssociation) error {
-	var url string
-	switch assocType {
-	case Company:
-		url = fmt.Sprintf(
-			"https://api.hubapi.com/crm/v3/objects/deals/%s/associations/company/%s/deal_to_company?hapikey=%s",
-			dealId,
-			assocId,
-			api.APIKey,
-		)
-	case Contact:
-		url = fmt.Sprintf(
-			"https://api.hubapi.com/crm/v3/objects/deals/%s/associations/contact/%s/deal_to_contact?hapikey=%s",
-			dealId,
-			assocId,
-			api.APIKey,
-		)
+func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType, assocType string) error {
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/associations/deal/%s/batch/create?hapikey=%s",
+		objectType,
+		api.APIKey,
+	)
+
+	associationRequest := DealAssociationBatchRequest{
+		Inputs: []DealAssociation{
+			{
+				From: DealAssociationFromTo{Id: dealId},
+				To:   DealAssociationFromTo{Id: assocId},
+				Type: assocType,
+			},
+		},
 	}
 
-	req, err := http.NewRequest("PUT", url, nil)
+	payloadBuf := new(bytes.Buffer)
+	err := json.NewEncoder(payloadBuf).Encode(associationRequest)
 	if err != nil {
 		return err
 	}
+
+	req, err := http.NewRequest("POST", url, payloadBuf)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	_, err = api.httpClient.Do(req)
 	if err != nil {
@@ -115,6 +130,7 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId string, asso
 func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	cardName string,
 	contactID string,
+	contactAssocType string,
 	companyID string,
 	stageName string,
 	pipeline string,
@@ -172,13 +188,13 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	}
 
 	// Associate the deal with a company based on the application id
-	err = api.AssociateDealFlowCard(hubspotResp.Id, companyID, Company)
+	err = api.AssociateDealFlowCard(hubspotResp.Id, companyID, "company", "deal_to_company")
 	if err != nil {
 		return nil, err
 	}
 
 	// Associate the deal with a contact based on the application id
-	err = api.AssociateDealFlowCard(hubspotResp.Id, contactID, Contact)
+	err = api.AssociateDealFlowCard(hubspotResp.Id, contactID, "contact", contactAssocType)
 	if err != nil {
 		return nil, err
 	}

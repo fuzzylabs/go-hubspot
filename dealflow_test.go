@@ -3,6 +3,7 @@ package go_hubspot
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,11 +12,6 @@ import (
 	"strconv"
 	"testing"
 )
-
-// getDealFlowAPI Get default HubSpot DealFlow API client
-func getDealFlowAPI() HubspotDealFlowAPI {
-	return NewHubspotDealFlowAPI("key")
-}
 
 func getMockDealFlowAPI(mockClient *IHTTPClientMock) HubspotDealFlowAPI {
 	return HubspotDealFlowAPI{
@@ -27,8 +23,8 @@ func getMockDealFlowAPI(mockClient *IHTTPClientMock) HubspotDealFlowAPI {
 func TestCreateDealFlowCard(t *testing.T) {
 
 	expected := DealCreationResponse{
-		"dealid",
-		dealCreationResponseProperties{
+		"dealId",
+		DealCreationResponseProperties{
 			"Amount",
 			"CloseDate",
 			"CreateDate",
@@ -156,18 +152,82 @@ func TestCreateDealFlowCard(t *testing.T) {
 				if err != nil {
 					t.Errorf("Error writing response in mock: %s", err.Error())
 				}
-			} else if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid/associations/company/companyId/deal_to_company?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
+				}
+
+				expectedRequest := DealAssociationBatchRequest{
+					Inputs: []DealAssociation{
+						{
+							From: DealAssociationFromTo{Id: "dealId"},
+							To:   DealAssociationFromTo{Id: "companyId"},
+							Type: "deal_to_company",
+						},
+					},
+				}
+
+				body, err := ioutil.ReadAll(req.Body)
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						t.Errorf("Error closing mock request body: %s", err.Error())
+					}
+				}(req.Body)
+
+				if err != nil {
+					t.Errorf("Error reading AssociateDealFlowCard request body: %s", err.Error())
+				}
+
+				var request DealAssociationBatchRequest
+				err = json.Unmarshal(body, &request)
+				if err != nil {
+					t.Errorf("Error unmarshalling AssociateDealFlowCard request: %s", err.Error())
+				}
+
+				if !cmp.Equal(expectedRequest, request) {
+					t.Errorf("Unexpected AssociateDealFlowCard request, expected:\n%s\ngot:\n%s", expectedRequest, request)
 				}
 
 				companyAssociation = true
 				w.WriteHeader(200)
-			} else if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid/associations/contact/contactId/deal_to_contact?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
+				}
+
+				expectedRequest := DealAssociationBatchRequest{
+					Inputs: []DealAssociation{
+						{
+							From: DealAssociationFromTo{Id: "dealId"},
+							To:   DealAssociationFromTo{Id: "contactId"},
+							Type: "contactAssocType",
+						},
+					},
+				}
+
+				body, err := ioutil.ReadAll(req.Body)
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						t.Errorf("Error closing mock request body: %s", err.Error())
+					}
+				}(req.Body)
+
+				if err != nil {
+					t.Errorf("Error reading AssociateDealFlowCard request body: %s", err.Error())
+				}
+
+				var request DealAssociationBatchRequest
+				err = json.Unmarshal(body, &request)
+				if err != nil {
+					t.Errorf("Error unmarshalling AssociateDealFlowCard request: %s", err.Error())
+				}
+
+				if !cmp.Equal(expectedRequest, request) {
+					t.Errorf("Unexpected AssociateDealFlowCard request, expected:\n%s\ngot:\n%s", expectedRequest, request)
 				}
 
 				contactAssociation = true
@@ -185,6 +245,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 	response, err := api.CreateDealFlowCard(
 		"cardName",
 		"contactId",
+		"contactAssocType",
 		"companyId",
 		"stageName",
 		"pipeline",
@@ -227,19 +288,81 @@ func TestAssociateDealFlowCard(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 			w := httptest.NewRecorder()
 
-			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid/associations/company/companyid/deal_to_company?hapikey=api_key" {
+			if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
+				expectedRequest := DealAssociationBatchRequest{
+					Inputs: []DealAssociation{
+						{
+							From: DealAssociationFromTo{Id: "dealId"},
+							To:   DealAssociationFromTo{Id: "companyId"},
+							Type: "company_type",
+						},
+					},
+				}
+
+				body, err := ioutil.ReadAll(req.Body)
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						t.Errorf("Error closing mock request body: %s", err.Error())
+					}
+				}(req.Body)
+
+				if err != nil {
+					t.Errorf("Error reading AssociateDealFlowCard request body: %s", err.Error())
+				}
+
+				var request DealAssociationBatchRequest
+				err = json.Unmarshal(body, &request)
+				if err != nil {
+					t.Errorf("Error unmarshalling AssociateDealFlowCard request: %s", err.Error())
+				}
+
+				if !cmp.Equal(expectedRequest, request) {
+					t.Errorf("Unexpected AssociateDealFlowCard request, expected:\n%s\ngot:\n%s", expectedRequest, request)
+				}
 				w.WriteHeader(200)
-			} else if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid/associations/contact/contactid/deal_to_contact?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
 				// Created an association between the deal and correct company
-				if req.Method != "PUT" {
-					t.Errorf("Deal association used %s, instead of PUT", req.Method)
+				if req.Method != "POST" {
+					t.Errorf("Deal association used %s, instead of POST", req.Method)
 				}
 
+				expectedRequest := DealAssociationBatchRequest{
+					Inputs: []DealAssociation{
+						{
+							From: DealAssociationFromTo{Id: "dealId"},
+							To:   DealAssociationFromTo{Id: "contactId"},
+							Type: "contact_type",
+						},
+					},
+				}
+
+				body, err := ioutil.ReadAll(req.Body)
+				defer func(Body io.ReadCloser) {
+					err := Body.Close()
+					if err != nil {
+						t.Errorf("Error closing mock request body: %s", err.Error())
+					}
+				}(req.Body)
+
+				if err != nil {
+					t.Errorf("Error reading AssociateDealFlowCard request body: %s", err.Error())
+				}
+
+				var request DealAssociationBatchRequest
+				err = json.Unmarshal(body, &request)
+				if err != nil {
+					t.Errorf("Error unmarshalling AssociateDealFlowCard request: %s", err.Error())
+				}
+
+				if !cmp.Equal(expectedRequest, request) {
+					t.Errorf("Unexpected AssociateDealFlowCard request, expected:\n%s\ngot:\n%s", expectedRequest, request)
+				}
 				w.WriteHeader(200)
 			} else {
 				t.Errorf("Unexpected url %s", url)
@@ -251,13 +374,13 @@ func TestAssociateDealFlowCard(t *testing.T) {
 
 	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
 
-	err := api.AssociateDealFlowCard("dealid", "companyid", Company)
+	err := api.AssociateDealFlowCard("dealId", "companyId", "company", "company_type")
 
 	if err != nil {
 		t.Errorf("Error on AssociateDealFlowCard: %s", err.Error())
 	}
 
-	err = api.AssociateDealFlowCard("dealid", "contactid", Contact)
+	err = api.AssociateDealFlowCard("dealId", "contactId", "contact", "contact_type")
 
 	if err != nil {
 		t.Errorf("Error on AssociateDealFlowCard: %s", err.Error())
@@ -276,7 +399,7 @@ func TestUpdateDealFlowCard(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=api_key" {
+			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealId?hapikey=api_key" {
 				// This is a deal flow creation call
 				// Test the body
 
@@ -331,7 +454,7 @@ func TestUpdateDealFlowCard(t *testing.T) {
 	api := getMockDealFlowAPI(&mockHubspotHTTPClient)
 
 	err := api.UpdateDealFlowCard(
-		"dealid",
+		"dealId",
 		map[string]string{
 			"dealname":                  "dealName",
 			"dealstage":                 "stageName",
