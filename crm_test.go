@@ -10,11 +10,6 @@ import (
 	"testing"
 )
 
-// getDealFlowAPI Get default HubSpot Form API client
-func getCRMAPI() HubspotCRMAPI {
-	return NewHubspotCRMAPI("key")
-}
-
 func getMockCRMAPI(mockClient *IHTTPClientMock) HubspotCRMAPI {
 	return HubspotCRMAPI{
 		APIKey:     "api_key",
@@ -22,7 +17,7 @@ func getMockCRMAPI(mockClient *IHTTPClientMock) HubspotCRMAPI {
 	}
 }
 
-var singleContactResponse []byte = []byte(`
+var singleObjectResponse []byte = []byte(`
 	{
 		"total":1,
 		"results":[
@@ -39,11 +34,11 @@ var singleContactResponse []byte = []byte(`
 	}
 `)
 
-var noContactResponse []byte = []byte(`
+var noObjectResponse []byte = []byte(`
 	{}
 `)
 
-var multipleContactResponse []byte = []byte(`
+var multipleObjectResponse []byte = []byte(`
 	{
 		"total":2,
 		"results":[
@@ -69,7 +64,7 @@ var multipleContactResponse []byte = []byte(`
 	}
 `)
 
-func generateContactMock(t *testing.T, response []byte) IHTTPClientMock {
+func generateMock(t *testing.T, response []byte) IHTTPClientMock {
 	return IHTTPClientMock{
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 
@@ -86,7 +81,7 @@ func generateContactMock(t *testing.T, response []byte) IHTTPClientMock {
 					},
 				},
 				Properties: []string{
-					"contact_id",
+					"id",
 					"company_number",
 				},
 			}
@@ -110,7 +105,7 @@ func generateContactMock(t *testing.T, response []byte) IHTTPClientMock {
 			}
 
 			w := httptest.NewRecorder()
-			expectedUrl := "https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=api_key"
+			expectedUrl := "https://api.hubapi.com/crm/v3/objects/objecttype/search?hapikey=api_key"
 			if url == expectedUrl {
 				if req.Method != "POST" {
 					t.Errorf("A request was made that should have been POST but was %s", req.Method)
@@ -126,38 +121,62 @@ func generateContactMock(t *testing.T, response []byte) IHTTPClientMock {
 	}
 }
 
-// searchContactsForApplicationIdTest runs a test on SearchContacts
+// searchForApplicationIdTest runs a test on SearchHubSpot
 // with a given response from the api and an expected result
-func searchContactsForApplicationIdTest(t *testing.T, response []byte, expectedContactIDs []string) {
-	mockHubSpotHTTPClient := generateContactMock(t, response)
+func searchForApplicationIdTest(t *testing.T, response []byte, expectedIDs []HubSpotSearchResult) {
+	mockHubSpotHTTPClient := generateMock(t, response)
 
 	api := getMockCRMAPI(&mockHubSpotHTTPClient)
-	gotResult, err := api.SearchContacts(
+	gotResult, err := api.SearchHubSpot(
+		"objecttype",
 		map[string]string{
 			"application_id": "example-application-id",
 		},
 		[]string{
-			"contact_id",
+			"id",
 			"company_number",
 		},
 	)
 	if err != nil {
-		t.Errorf("SearchContacts failed; %s", err.Error())
+		t.Errorf("SearchHubSpot failed; %s", err.Error())
 	}
 
-	if len(gotResult) != len(expectedContactIDs) {
-		t.Errorf("Incorrect number of returned results, expected %d, got %d", len(expectedContactIDs), len(gotResult))
+	if len(gotResult) != len(expectedIDs) {
+		t.Errorf("Incorrect number of returned results, expected %d, got %d", len(expectedIDs), len(gotResult))
 	}
 
 	if len(mockHubSpotHTTPClient.DoCalls()) != 1 {
 		t.Errorf("Expected 1 call to HubSpot API")
 	}
 
-	for i, _ := range gotResult {
-		if gotResult[i].Id != expectedContactIDs[i] {
-			t.Errorf("SearchContacts returned incorrect contact IDs, expected:\n%s\ngot:\n%s\n", expectedContactIDs, gotResult)
+	for i := range gotResult {
+		if gotResult[i].Id != expectedIDs[i].Id {
+			t.Errorf("SearchHubSpot returned incorrect IDs, expected:\n%s\ngot:\n%s\n", expectedIDs, gotResult)
 		}
 	}
+}
+
+func TestSearchHubSpot(t *testing.T) {
+	searchForApplicationIdTest(t, noObjectResponse, []HubSpotSearchResult{})
+	searchForApplicationIdTest(t, singleObjectResponse, []HubSpotSearchResult{
+		{
+			Id:           "123id",
+			Properties:   map[string]string{"company_number": "11762819"},
+			Associations: map[string]Associations{},
+		},
+	})
+	searchForApplicationIdTest(t, multipleObjectResponse, []HubSpotSearchResult{
+		{
+			Id:           "123id",
+			Properties:   map[string]string{"company_number": "11762819"},
+			Associations: map[string]Associations{},
+		},
+		{
+			Id:           "456id",
+			Properties:   map[string]string{"company_number": "87654321"},
+			Associations: map[string]Associations{},
+		},
+	})
 }
 
 func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientMock {
