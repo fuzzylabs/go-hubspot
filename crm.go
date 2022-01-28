@@ -14,7 +14,8 @@ type IHubspotCRMAPI interface {
 	UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error
 	GetCompanyForContact(contactID string) (string, error)
 	GetDealForCompany(companyID string) (string, error)
-	SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error)
+	SearchContacts(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error)
+	SearchCompanies(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error)
 }
 
 type HubspotCRMAPI struct {
@@ -22,9 +23,9 @@ type HubspotCRMAPI struct {
 	httpClient IHTTPClient
 }
 
-type HubSpotContactSearchResponse struct {
-	Total   int             `json:"total"`
-	Results []ContactResult `json:"results"`
+type HubSpotSearchResponse struct {
+	Total   int                   `json:"total"`
+	Results []HubSpotSearchResult `json:"results"`
 }
 
 type Association struct {
@@ -36,7 +37,7 @@ type Associations struct {
 	Results []Association `json:"results"`
 }
 
-type ContactResult struct {
+type HubSpotSearchResult struct {
 	Id           string                  `json:"id"`
 	Properties   map[string]string       `json:"properties"`
 	Associations map[string]Associations `json:"associations"`
@@ -186,9 +187,19 @@ func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 }
 
 // SearchContacts searches for contacts with the provided filters and returns properties for the results found
-func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties []string) ([]ContactResult, error) {
-	censoredUrl := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", "<censored>")
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=%s", api.APIKey)
+func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
+	return api.SearchHubSpot("contacts", filterMap, properties)
+}
+
+// SearchCompanies searches for companies with the provided filters and returns properties for the results found
+func (api HubspotCRMAPI) SearchCompanies(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
+	return api.SearchHubSpot("companies", filterMap, properties)
+}
+
+// SearchHubSpot searches for an object type with the provided filters and returns properties for the results found
+func (api HubspotCRMAPI) SearchHubSpot(objectType string, filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
+	censoredUrl := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/%s/search?hapikey=%s", objectType, "<censored>")
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/%s/search?hapikey=%s", objectType, api.APIKey)
 
 	var filters = make([]filter, len(filterMap))
 	filterIndex := 0
@@ -238,7 +249,7 @@ func (api HubspotCRMAPI) SearchContacts(filterMap map[string]string, properties 
 		return nil, err
 	}
 
-	var hubspotResp HubSpotContactSearchResponse
+	var hubspotResp HubSpotSearchResponse
 
 	log.Infof("Raw response: %s", string(body))
 	err = json.Unmarshal(body, &hubspotResp)
