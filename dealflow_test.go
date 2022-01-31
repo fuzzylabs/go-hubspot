@@ -99,9 +99,9 @@ func TestCreateDealFlowCard(t *testing.T) {
 				}
 			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=api_key" {
 				// Searching for contact
-				searchResponse := HubSpotContactSearchResponse{
+				searchResponse := HubSpotSearchResponse{
 					1,
-					[]ContactResult{
+					[]HubSpotSearchResult{
 						{
 							"contactid",
 							map[string]string{
@@ -125,7 +125,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 				}
 			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/contactid?associations=company&archived=false&hapikey=api_key" {
 				// Searching for company
-				searchResponse := ContactResult{
+				searchResponse := HubSpotSearchResult{
 					"contactid",
 					map[string]string{
 						"company_number": "companyNumber",
