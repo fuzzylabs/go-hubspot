@@ -39,7 +39,7 @@ func TestUploadFile(t *testing.T) {
 				}
 
 				expectedOptions := FileUploadOptions{
-					Access:                      "PRIVATE",
+					Access:                      "PUBLIC_NOT_INDEXABLE",
 					Overwrite:                   true,
 					DuplicateValidationStrategy: "NONE",
 					DuplicateValidationScope:    "EXACT_FOLDER",
