@@ -23,7 +23,7 @@ var _ IHubspotFormAPI = &IHubspotFormAPIMock{}
 // 			QueryFunc: func(after string) (*HubspotResponse, error) {
 // 				panic("mock out the Query method")
 // 			},
-// 			SearchForKeyValueFunc: func(key string, value string) (map[string]string, error) {
+// 			SearchForKeyValueFunc: func(key string, value string) (map[string]HubspotFormField, error) {
 // 				panic("mock out the SearchForKeyValue method")
 // 			},
 // 		}
@@ -40,7 +40,7 @@ type IHubspotFormAPIMock struct {
 	QueryFunc func(after string) (*HubspotResponse, error)
 
 	// SearchForKeyValueFunc mocks the SearchForKeyValue method.
-	SearchForKeyValueFunc func(key string, value string) (map[string]string, error)
+	SearchForKeyValueFunc func(key string, value string) (map[string]HubspotFormField, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -130,7 +130,7 @@ func (mock *IHubspotFormAPIMock) QueryCalls() []struct {
 }
 
 // SearchForKeyValue calls SearchForKeyValueFunc.
-func (mock *IHubspotFormAPIMock) SearchForKeyValue(key string, value string) (map[string]string, error) {
+func (mock *IHubspotFormAPIMock) SearchForKeyValue(key string, value string) (map[string]HubspotFormField, error) {
 	if mock.SearchForKeyValueFunc == nil {
 		panic("IHubspotFormAPIMock.SearchForKeyValueFunc: method is nil but IHubspotFormAPI.SearchForKeyValue was just called")
 	}

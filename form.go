@@ -12,7 +12,7 @@ import (
 type IHubspotFormAPI interface {
 	GetPageURL(after string) string
 	Query(after string) (*HubspotResponse, error)
-	SearchForKeyValue(key string, value string) (map[string]string, error)
+	SearchForKeyValue(key string, value string) (map[string]HubspotFormField, error)
 }
 
 // HubspotFormAPI is the structure to interact with Hubspot Form API
@@ -56,11 +56,47 @@ func NewHubspotFormAPI(formID string, apiKey string) HubspotFormAPI {
 	}
 }
 
+type HubspotFieldType int64
+
+const (
+	SingleValue HubspotFieldType = iota
+	MultipleValues
+)
+
+type HubspotFormField struct {
+	Type           HubspotFieldType
+	SingleValue    string
+	MultipleValues []string
+}
+
+func (field HubspotFormField) ForceMultipleValues() []string {
+	if field.Type == SingleValue {
+		return []string{field.SingleValue}
+	} else {
+		return field.MultipleValues
+	}
+}
+
 // GetSubmissionMap transforms Hubspot form submission into a string map
-func GetSubmissionMap(submission Submission) map[string]string {
-	submissionMap := map[string]string{}
+func GetSubmissionMap(submission Submission) map[string]HubspotFormField {
+	submissionMap := map[string]HubspotFormField{}
 	for _, value := range submission.Values {
-		submissionMap[value.Name] = value.Value
+		if field, ok := submissionMap[value.Name]; ok {
+			if field.Type == SingleValue {
+				field.Type = MultipleValues
+				field.MultipleValues = make([]string, 1)
+				field.MultipleValues[0] = field.SingleValue
+				field.SingleValue = ""
+			}
+			field.MultipleValues = append(field.MultipleValues, value.Value)
+			submissionMap[value.Name] = field
+		} else {
+			field := HubspotFormField{
+				Type:        SingleValue,
+				SingleValue: value.Value,
+			}
+			submissionMap[value.Name] = field
+		}
 	}
 	return submissionMap
 }
@@ -111,7 +147,7 @@ func (r HubspotResponse) GetNextAfter() (string, error) {
 }
 
 // SearchForKeyValue searches for a form submission on Hubspot for a given key-value pair
-func (api HubspotFormAPI) SearchForKeyValue(key string, value string) (map[string]string, error) {
+func (api HubspotFormAPI) SearchForKeyValue(key string, value string) (map[string]HubspotFormField, error) {
 	log.Printf("Searching for submission with %s = %s\n", key, value)
 
 	after := ""
@@ -142,11 +178,11 @@ func (api HubspotFormAPI) SearchForKeyValue(key string, value string) (map[strin
 }
 
 // GetByKeyValue searches Hubspot results for a form with a given key-value pair
-func (r HubspotResponse) GetByKeyValue(key string, value string) (map[string]string, error) {
+func (r HubspotResponse) GetByKeyValue(key string, value string) (map[string]HubspotFormField, error) {
 	for _, result := range r.Results {
 		submission := GetSubmissionMap(result)
 
-		if submission[key] == value {
+		if submission[key].Type == SingleValue && submission[key].SingleValue == value {
 			log.Printf("Found: %#v", submission)
 			return submission, nil
 		}

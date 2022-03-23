@@ -1,6 +1,7 @@
 package go_hubspot
 
 import (
+	"github.com/google/go-cmp/cmp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -32,28 +33,41 @@ func TestGetSubmissionMap(t *testing.T) {
 				Name:  "name2",
 				Value: "value2",
 			},
+			{
+				Name:  "name3",
+				Value: "value3-1",
+			},
+			{
+				Name:  "name3",
+				Value: "value3-2",
+			},
 		},
 	}
 
-	expected := map[string]string{
-		"name1": "value1",
-		"name2": "value2",
+	testValue1 := "value1"
+	testValue2 := "value2"
+	expected := map[string]HubspotFormField{
+		"name1": {
+			Type:        SingleValue,
+			SingleValue: testValue1,
+		},
+		"name2": {
+			Type:        SingleValue,
+			SingleValue: testValue2,
+		},
+		"name3": {
+			Type: MultipleValues,
+			MultipleValues: []string{
+				"value3-1",
+				"value3-2",
+			},
+		},
 	}
 
 	got := GetSubmissionMap(submission)
 
-	for key := range expected {
-		if got[key] != expected[key] {
-			t.Errorf("Expected: %#v, got: %#v", expected, got)
-			break
-		}
-	}
-
-	for key := range got {
-		if got[key] != expected[key] {
-			t.Errorf("Expected: %#v, got: %#v", expected, got)
-			break
-		}
+	if !cmp.Equal(got, expected) {
+		t.Errorf("Expected: %#v\nGot: %#v", expected, got)
 	}
 }
 
@@ -224,7 +238,7 @@ func TestSearchForApplicationID(t *testing.T) {
 
 	form, err := api.SearchForKeyValue("application_id", "application_id1")
 
-	if err != nil || form["application_id"] != "application_id1" || form["company"] != "company1" {
+	if err != nil || form["application_id"].SingleValue != "application_id1" || form["company"].SingleValue != "company1" {
 		t.Errorf("Expected to find form with application_id1 on page 1")
 	}
 
@@ -234,7 +248,7 @@ func TestSearchForApplicationID(t *testing.T) {
 
 	form, err = api.SearchForKeyValue("application_id", "application_id2")
 
-	if err != nil || form["application_id"] != "application_id2" || form["company"] != "company2" {
+	if err != nil || form["application_id"].SingleValue != "application_id2" || form["company"].SingleValue != "company2" {
 		t.Errorf("Expected to find form with application_id2 on page 2")
 	}
 
