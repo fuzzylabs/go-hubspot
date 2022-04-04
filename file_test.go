@@ -13,10 +13,69 @@ import (
 
 func getMockFileAPI(mockClient *IHTTPClientMock) HubspotFileAPI {
 	return HubspotFileAPI{
-		URLTemplate: "https://api.hubapi.com/files/v3/files?hapikey=%s",
+		URLTemplate: "https://api.hubapi.com/files/v3/files%s?hapikey=%s",
 		APIKey:      "apiKey",
 		PortalID:    "portalId",
 		httpClient:  mockClient,
+	}
+}
+
+func TestMakeFilePublic(t *testing.T) {
+	mockHubspotHTTPClient := IHTTPClientMock{
+		DoFunc: func(req *http.Request) (*http.Response, error) {
+			expectedRequestUrl := "https://api.hubapi.com/files/v3/files/fileid?hapikey=apiKey"
+			expectedOptions := FileUploadOptions{Access: "PUBLIC_NOT_INDEXABLE"}
+			if req.URL.String() != expectedRequestUrl {
+				t.Errorf("Unexpected URL: %s", req.URL.String())
+				return nil, nil
+			}
+
+			var options FileUploadOptions
+			err := json.NewDecoder(req.Body).Decode(&options)
+			if err != nil {
+				t.Errorf("Unexpected error: %s", err.Error())
+				return nil, nil
+			}
+
+			if !cmp.Equal(options, expectedOptions) {
+				t.Errorf("Options expected: %#v\nGot: %#v", expectedOptions, options)
+				return nil, nil
+			}
+
+			w := httptest.NewRecorder()
+			w.WriteHeader(200)
+			w.Write([]byte(`{
+				  "id":"59358383010",
+				  "createdAt":"2021-11-09T16:23:40.166Z",
+				  "updatedAt":"2021-11-09T16:23:40.166Z",
+				  "archived":false,
+				  "parentFolderId":"59348125351",
+				  "name":"fileName",
+				  "path":"/folderPath/Test123",
+				  "size":16,
+				  "type":"OTHER",
+				  "extension":"",
+				  "defaultHostingUrl":"https://f.hubspotusercontent10.net/hubfs/8458264/folderPath/Test123",
+				  "url":"https://f.hubspotusercontent10.net/hubfs/8458264/folderPath/Test123",
+				  "isUsableInContent":true,
+				  "access":"PUBLIC_NOT_INDEXABLE"
+				}`))
+
+			return w.Result(), nil
+		},
+	}
+
+	expectedLink := "https://f.hubspotusercontent10.net/hubfs/8458264/folderPath/Test123"
+
+	api := getMockFileAPI(&mockHubspotHTTPClient)
+
+	gotLink, err := api.MakeFilePublic("fileid")
+	if err != nil {
+		t.Errorf("Error making file public: %s", err.Error())
+	}
+
+	if expectedLink != gotLink {
+		t.Errorf("File upload returned unexpected link, expected: %s got: %s", expectedLink, gotLink)
 	}
 }
 
