@@ -13,7 +13,7 @@ import (
 
 func getMockFileAPI(mockClient *IHTTPClientMock) HubspotFileAPI {
 	return HubspotFileAPI{
-		URLTemplate: "https://api.hubapi.com/files/v3/files?hapikey=%s",
+		URL: "https://api.hubapi.com/files/v3/files",
 		APIKey:      "apiKey",
 		PortalID:    "portalId",
 		httpClient:  mockClient,
@@ -32,7 +32,7 @@ func TestUploadFile(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/files/v3/files?hapikey=apiKey" {
+			if url == "https://api.hubapi.com/files/v3/files" {
 
 				if req.Method != "POST" {
 					t.Errorf("Unexpected method: expected POST, got: %s", req.Method)

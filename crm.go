@@ -69,13 +69,13 @@ func NewHubspotCRMAPI(apiKey string) HubspotCRMAPI {
 // UpdateCompany updates company details in HubSpot CRM
 func (api HubspotCRMAPI) UpdateCompany(companyID string, jsonPayload *bytes.Buffer) error {
 	url := fmt.Sprintf(
-		"https://api.hubapi.com/crm/v3/objects/companies/%s?hapikey=%s",
+		"https://api.hubapi.com/crm/v3/objects/companies/%s",
 		companyID,
-		api.APIKey,
 	)
 
 	req, _ := http.NewRequest("PATCH", url, jsonPayload)
 
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := api.httpClient.Do(req)
@@ -108,12 +108,13 @@ func (api HubspotCRMAPI) UpdateCompany(companyID string, jsonPayload *bytes.Buff
 // If no company is found "" is returned, no error is thrown
 func (api HubspotCRMAPI) GetCompanyForContact(contactID string) (string, error) {
 	url := fmt.Sprintf(
-		"https://api.hubapi.com/crm/v3/objects/contacts/%s/associations/company?hapikey=%s",
+		"https://api.hubapi.com/crm/v3/objects/contacts/%s/associations/company",
 		contactID,
-		api.APIKey,
 	)
 
 	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := api.httpClient.Do(req)
 	if err != nil {
@@ -148,12 +149,13 @@ func (api HubspotCRMAPI) GetCompanyForContact(contactID string) (string, error) 
 // Returns "" with nil error if no company exists
 func (api HubspotCRMAPI) GetDealForCompany(companyID string) (string, error) {
 	url := fmt.Sprintf(
-		"https://api.hubapi.com/crm/v3/objects/companies/%s/associations/deal?limit=500&hapikey=%s",
+		"https://api.hubapi.com/crm/v3/objects/companies/%s/associations/deal?limit=500",
 		companyID,
-		api.APIKey,
 	)
 
 	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := api.httpClient.Do(req)
 	if err != nil {
@@ -198,8 +200,7 @@ func (api HubspotCRMAPI) SearchCompanies(filterMap map[string]string, properties
 
 // SearchHubSpot searches for an object type with the provided filters and returns properties for the results found
 func (api HubspotCRMAPI) SearchHubSpot(objectType string, filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
-	censoredUrl := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/%s/search?hapikey=%s", objectType, "<censored>")
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/%s/search?hapikey=%s", objectType, api.APIKey)
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/%s/search", objectType)
 
 	var filters = make([]filter, len(filterMap))
 	filterIndex := 0
@@ -220,7 +221,7 @@ func (api HubspotCRMAPI) SearchHubSpot(objectType string, filterMap map[string]s
 		Properties: properties,
 	}
 
-	log.Infof("Making query to contact search endpoint (%s) with: %#v", censoredUrl, searchQuery)
+	log.Infof("Making query to contact search endpoint (%s) with: %#v", url, searchQuery)
 
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(searchQuery)
@@ -229,6 +230,7 @@ func (api HubspotCRMAPI) SearchHubSpot(objectType string, filterMap map[string]s
 	}
 
 	req, err := http.NewRequest("POST", url, payloadBuf)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	log.Infof("Query Payload: %s", payloadBuf.String())

@@ -72,7 +72,7 @@ func TestGetSubmissionMap(t *testing.T) {
 }
 
 func TestGetPageURL(t *testing.T) {
-	expected := "https://api.hubapi.com/form-integrations/v1/submissions/forms/form?hapikey=key&limit=50&after=some-application-id"
+	expected := "https://api.hubapi.com/form-integrations/v1/submissions/forms/form?limit=50&after=some-application-id"
 	api := getFormAPI()
 	got := api.GetPageURL("some-application-id")
 	if expected != got {
@@ -158,7 +158,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) { return nil, nil },
 		GetFunc: func(url string) (resp *http.Response, err error) {
 			w := httptest.NewRecorder()
-			if url == "https://example.com/form_id?hapikey=api_key&limit=50&after=" {
+			if url == "https://example.com/form_id?limit=50&after=" {
 				w.WriteHeader(200)
 				w.Write([]byte(`
 				{
@@ -187,7 +187,7 @@ func TestSearchForApplicationID(t *testing.T) {
 					}
 				}
 				`))
-			} else if url == "https://example.com/form_id?hapikey=api_key&limit=50&after=first" {
+			} else if url == "https://example.com/form_id?limit=50&after=first" {
 				w.WriteHeader(200)
 				w.Write([]byte(`
 				{
@@ -216,7 +216,7 @@ func TestSearchForApplicationID(t *testing.T) {
 					}
 				}
 				`))
-			} else if url == "https://example.com/form_id?hapikey=api_key&limit=50&after=second" {
+			} else if url == "https://example.com/form_id?limit=50&after=second" {
 				w.WriteHeader(200)
 				w.Write([]byte(`
 				{
@@ -230,7 +230,7 @@ func TestSearchForApplicationID(t *testing.T) {
 	}
 
 	api := HubspotFormAPI{
-		URLTemplate: "https://example.com/%s?hapikey=%s&limit=50&after=%s",
+		URLTemplate: "https://example.com/%s?limit=50&after=%s",
 		FormID:      "form_id",
 		APIKey:      "api_key",
 		httpClient:  &mockHubspotHTTPClient,
@@ -242,7 +242,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		t.Errorf("Expected to find form with application_id1 on page 1")
 	}
 
-	if len(mockHubspotHTTPClient.GetCalls()) != 1 {
+	if len(mockHubspotHTTPClient.DoCalls()) != 1 {
 		t.Errorf("Expected 1 call to HubSpot API")
 	}
 
@@ -252,7 +252,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		t.Errorf("Expected to find form with application_id2 on page 2")
 	}
 
-	if len(mockHubspotHTTPClient.GetCalls()) != 3 {
+	if len(mockHubspotHTTPClient.DoCalls()) != 3 {
 		t.Errorf("Expected 2 call to HubSpot API")
 	}
 
@@ -262,7 +262,7 @@ func TestSearchForApplicationID(t *testing.T) {
 		t.Errorf("Expected to not find form with application_id=none")
 	}
 
-	if len(mockHubspotHTTPClient.GetCalls()) != 6 {
+	if len(mockHubspotHTTPClient.DoCalls()) != 6 {
 		t.Errorf("Expected 3 call to HubSpot API")
 	}
 

@@ -17,9 +17,6 @@ var _ IHubspotFileAPI = &IHubspotFileAPIMock{}
 //
 // 		// make and configure a mocked IHubspotFileAPI
 // 		mockedIHubspotFileAPI := &IHubspotFileAPIMock{
-// 			GetPageURLFunc: func() string {
-// 				panic("mock out the GetPageURL method")
-// 			},
 // 			UploadFileFunc: func(file []byte, folderPath string, fileName string) (string, error) {
 // 				panic("mock out the UploadFile method")
 // 			},
@@ -30,17 +27,11 @@ var _ IHubspotFileAPI = &IHubspotFileAPIMock{}
 //
 // 	}
 type IHubspotFileAPIMock struct {
-	// GetPageURLFunc mocks the GetPageURL method.
-	GetPageURLFunc func() string
-
 	// UploadFileFunc mocks the UploadFile method.
 	UploadFileFunc func(file []byte, folderPath string, fileName string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// GetPageURL holds details about calls to the GetPageURL method.
-		GetPageURL []struct {
-		}
 		// UploadFile holds details about calls to the UploadFile method.
 		UploadFile []struct {
 			// File is the file argument value.
@@ -51,34 +42,7 @@ type IHubspotFileAPIMock struct {
 			FileName string
 		}
 	}
-	lockGetPageURL sync.RWMutex
 	lockUploadFile sync.RWMutex
-}
-
-// GetPageURL calls GetPageURLFunc.
-func (mock *IHubspotFileAPIMock) GetPageURL() string {
-	if mock.GetPageURLFunc == nil {
-		panic("IHubspotFileAPIMock.GetPageURLFunc: method is nil but IHubspotFileAPI.GetPageURL was just called")
-	}
-	callInfo := struct {
-	}{}
-	mock.lockGetPageURL.Lock()
-	mock.calls.GetPageURL = append(mock.calls.GetPageURL, callInfo)
-	mock.lockGetPageURL.Unlock()
-	return mock.GetPageURLFunc()
-}
-
-// GetPageURLCalls gets all the calls that were made to GetPageURL.
-// Check the length with:
-//     len(mockedIHubspotFileAPI.GetPageURLCalls())
-func (mock *IHubspotFileAPIMock) GetPageURLCalls() []struct {
-} {
-	var calls []struct {
-	}
-	mock.lockGetPageURL.RLock()
-	calls = mock.calls.GetPageURL
-	mock.lockGetPageURL.RUnlock()
-	return calls
 }
 
 // UploadFile calls UploadFileFunc.

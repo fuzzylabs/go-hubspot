@@ -105,7 +105,7 @@ func generateMock(t *testing.T, response []byte) IHTTPClientMock {
 			}
 
 			w := httptest.NewRecorder()
-			expectedUrl := "https://api.hubapi.com/crm/v3/objects/objecttype/search?hapikey=api_key"
+			expectedUrl := "https://api.hubapi.com/crm/v3/objects/objecttype/search"
 			if url == expectedUrl {
 				if req.Method != "POST" {
 					t.Errorf("A request was made that should have been POST but was %s", req.Method)
@@ -187,7 +187,7 @@ func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientM
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			expectedUrl := "https://api.hubapi.com/crm/v3/objects/contacts/contactid/associations/company?hapikey=api_key"
+			expectedUrl := "https://api.hubapi.com/crm/v3/objects/contacts/contactid/associations/company"
 			if url == expectedUrl {
 
 				if req.Method != "GET" {
@@ -283,7 +283,7 @@ func createDealForCompanyMock(t *testing.T, numberOfResults int) IHTTPClientMock
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			expectedUrl := "https://api.hubapi.com/crm/v3/objects/companies/companyid/associations/deal?limit=500&hapikey=api_key"
+			expectedUrl := "https://api.hubapi.com/crm/v3/objects/companies/companyid/associations/deal?limit=500"
 			if url == expectedUrl {
 
 				if req.Method != "GET" {

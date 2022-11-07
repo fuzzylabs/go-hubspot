@@ -49,7 +49,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/crm/v3/objects/deals?hapikey=api_key" {
+			if url == "https://api.hubapi.com/crm/v3/objects/deals" {
 				// This is a deal flow creation call
 				// Test the body
 
@@ -97,7 +97,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 				if err != nil {
 					t.Errorf("Error writing response in mock: %s", err.Error())
 				}
-			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/search?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/search" {
 				// Searching for contact
 				searchResponse := HubSpotSearchResponse{
 					1,
@@ -123,7 +123,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 				if err != nil {
 					t.Errorf("Error writing response in mock: %s", err.Error())
 				}
-			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/contactid?associations=company&archived=false&hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/objects/contacts/contactid?associations=company&archived=false" {
 				// Searching for company
 				searchResponse := HubSpotSearchResult{
 					"contactid",
@@ -152,7 +152,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 				if err != nil {
 					t.Errorf("Error writing response in mock: %s", err.Error())
 				}
-			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create" {
 				// Created an association between the deal and correct company
 				if req.Method != "POST" {
 					t.Errorf("Deal association used %s, instead of POST", req.Method)
@@ -192,7 +192,7 @@ func TestCreateDealFlowCard(t *testing.T) {
 
 				companyAssociation = true
 				w.WriteHeader(200)
-			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create" {
 				// Created an association between the deal and correct company
 				if req.Method != "POST" {
 					t.Errorf("Deal association used %s, instead of POST", req.Method)
@@ -288,7 +288,7 @@ func TestAssociateDealFlowCard(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 			w := httptest.NewRecorder()
 
-			if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create?hapikey=api_key" {
+			if url == "https://api.hubapi.com/crm/v3/associations/deal/company/batch/create" {
 				// Created an association between the deal and correct company
 				if req.Method != "POST" {
 					t.Errorf("Deal association used %s, instead of POST", req.Method)
@@ -326,7 +326,7 @@ func TestAssociateDealFlowCard(t *testing.T) {
 					t.Errorf("Unexpected AssociateDealFlowCard request, expected:\n%s\ngot:\n%s", expectedRequest, request)
 				}
 				w.WriteHeader(200)
-			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create?hapikey=api_key" {
+			} else if url == "https://api.hubapi.com/crm/v3/associations/deal/contact/batch/create" {
 				// Created an association between the deal and correct company
 				if req.Method != "POST" {
 					t.Errorf("Deal association used %s, instead of POST", req.Method)
@@ -399,7 +399,7 @@ func TestUpdateDealFlowCard(t *testing.T) {
 			url := fmt.Sprintf("%s", req.URL)
 
 			w := httptest.NewRecorder()
-			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealId?hapikey=api_key" {
+			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealId" {
 				// This is a deal flow creation call
 				// Test the body
 
@@ -479,7 +479,7 @@ func TestUpdateDealFlowCard(t *testing.T) {
 //			url := fmt.Sprintf("%s", req.URL)
 //
 //			w := httptest.NewRecorder()
-//			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid?hapikey=api_key" {
+//			if url == "https://api.hubapi.com/crm/v3/objects/deals/dealid" {
 //				// This is a deal flow creation call
 //				// Test the body
 //

@@ -11,13 +11,12 @@ import (
 )
 
 type IHubspotFileAPI interface {
-	GetPageURL() string
 	UploadFile(file []byte, folderPath, fileName string) (string, error)
 }
 
 // HubspotFileAPI is the structure to interact with Hubspot File API
 type HubspotFileAPI struct {
-	URLTemplate string
+	URL string
 	APIKey      string
 	PortalID    string
 	httpClient  IHTTPClient
@@ -31,19 +30,11 @@ type FileUploadResponse struct {
 // NewHubspotFileAPI creates new HubspotFileAPI and API key
 func NewHubspotFileAPI(apiKey string, portalId string) HubspotFileAPI {
 	return HubspotFileAPI{
-		URLTemplate: "https://api.hubapi.com/files/v3/files?hapikey=%s",
+		URL: "https://api.hubapi.com/files/v3/files",
 		APIKey:      apiKey,
 		PortalID:    portalId,
 		httpClient:  HTTPClient{},
 	}
-}
-
-// GetPageURL gets query URL for a page of results
-func (api HubspotFileAPI) GetPageURL() string {
-	return fmt.Sprintf(
-		api.URLTemplate,
-		api.APIKey,
-	)
 }
 
 type FileUploadOptions struct {
@@ -94,11 +85,12 @@ func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", api.GetPageURL(), &data)
+	req, err := http.NewRequest("POST", api.URL, &data)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("Error while constructing a request: %s", err.Error()))
 	}
 
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
 	resp, err := api.httpClient.Do(req)
