@@ -14,19 +14,19 @@ var _ IHTTPClient = &IHTTPClientMock{}
 
 // IHTTPClientMock is a mock implementation of IHTTPClient.
 //
-// 	func TestSomethingThatUsesIHTTPClient(t *testing.T) {
+//	func TestSomethingThatUsesIHTTPClient(t *testing.T) {
 //
-// 		// make and configure a mocked IHTTPClient
-// 		mockedIHTTPClient := &IHTTPClientMock{
-// 			DoFunc: func(req *http.Request) (*http.Response, error) {
-// 				panic("mock out the Do method")
-// 			},
-// 		}
+//		// make and configure a mocked IHTTPClient
+//		mockedIHTTPClient := &IHTTPClientMock{
+//			DoFunc: func(req *http.Request) (*http.Response, error) {
+//				panic("mock out the Do method")
+//			},
+//		}
 //
-// 		// use mockedIHTTPClient in code that requires IHTTPClient
-// 		// and then make assertions.
+//		// use mockedIHTTPClient in code that requires IHTTPClient
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHTTPClientMock struct {
 	// DoFunc mocks the Do method.
 	DoFunc func(req *http.Request) (*http.Response, error)
@@ -39,7 +39,7 @@ type IHTTPClientMock struct {
 			Req *http.Request
 		}
 	}
-	lockDo  sync.RWMutex
+	lockDo sync.RWMutex
 }
 
 // Do calls DoFunc.
@@ -60,7 +60,8 @@ func (mock *IHTTPClientMock) Do(req *http.Request) (*http.Response, error) {
 
 // DoCalls gets all the calls that were made to Do.
 // Check the length with:
-//     len(mockedIHTTPClient.DoCalls())
+//
+//	len(mockedIHTTPClient.DoCalls())
 func (mock *IHTTPClientMock) DoCalls() []struct {
 	Req *http.Request
 } {

@@ -181,7 +181,6 @@ func TestSearchHubSpot(t *testing.T) {
 
 func createCompanyForContactMock(t *testing.T, numberOfResults int) IHTTPClientMock {
 	return IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 
 			url := fmt.Sprintf("%s", req.URL)
@@ -277,7 +276,6 @@ func TestGetCompanyForContact(t *testing.T) {
 
 func createDealForCompanyMock(t *testing.T, numberOfResults int) IHTTPClientMock {
 	return IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 
 			url := fmt.Sprintf("%s", req.URL)

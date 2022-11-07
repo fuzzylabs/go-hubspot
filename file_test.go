@@ -27,7 +27,6 @@ func TestUploadFile(t *testing.T) {
 	fileContent := []byte("Hello World File Content")
 
 	mockHubspotHTTPClient := IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 			url := fmt.Sprintf("%s", req.URL)
 

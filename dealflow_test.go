@@ -44,7 +44,6 @@ func TestCreateDealFlowCard(t *testing.T) {
 	contactAssociation := false
 
 	mockHubspotHTTPClient := IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 			url := fmt.Sprintf("%s", req.URL)
 
@@ -283,7 +282,6 @@ func TestCreateDealFlowCard(t *testing.T) {
 
 func TestAssociateDealFlowCard(t *testing.T) {
 	mockHubspotHTTPClient := IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 			url := fmt.Sprintf("%s", req.URL)
 			w := httptest.NewRecorder()
@@ -394,7 +392,6 @@ func TestAssociateDealFlowCard(t *testing.T) {
 
 func TestUpdateDealFlowCard(t *testing.T) {
 	mockHubspotHTTPClient := IHTTPClientMock{
-		GetFunc: func(url string) (resp *http.Response, err error) { return nil, nil },
 		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
 			url := fmt.Sprintf("%s", req.URL)
 

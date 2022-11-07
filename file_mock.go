@@ -13,19 +13,19 @@ var _ IHubspotFileAPI = &IHubspotFileAPIMock{}
 
 // IHubspotFileAPIMock is a mock implementation of IHubspotFileAPI.
 //
-// 	func TestSomethingThatUsesIHubspotFileAPI(t *testing.T) {
+//	func TestSomethingThatUsesIHubspotFileAPI(t *testing.T) {
 //
-// 		// make and configure a mocked IHubspotFileAPI
-// 		mockedIHubspotFileAPI := &IHubspotFileAPIMock{
-// 			UploadFileFunc: func(file []byte, folderPath string, fileName string) (string, error) {
-// 				panic("mock out the UploadFile method")
-// 			},
-// 		}
+//		// make and configure a mocked IHubspotFileAPI
+//		mockedIHubspotFileAPI := &IHubspotFileAPIMock{
+//			UploadFileFunc: func(file []byte, folderPath string, fileName string) (string, error) {
+//				panic("mock out the UploadFile method")
+//			},
+//		}
 //
-// 		// use mockedIHubspotFileAPI in code that requires IHubspotFileAPI
-// 		// and then make assertions.
+//		// use mockedIHubspotFileAPI in code that requires IHubspotFileAPI
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHubspotFileAPIMock struct {
 	// UploadFileFunc mocks the UploadFile method.
 	UploadFileFunc func(file []byte, folderPath string, fileName string) (string, error)
@@ -67,7 +67,8 @@ func (mock *IHubspotFileAPIMock) UploadFile(file []byte, folderPath string, file
 
 // UploadFileCalls gets all the calls that were made to UploadFile.
 // Check the length with:
-//     len(mockedIHubspotFileAPI.UploadFileCalls())
+//
+//	len(mockedIHubspotFileAPI.UploadFileCalls())
 func (mock *IHubspotFileAPIMock) UploadFileCalls() []struct {
 	File       []byte
 	FolderPath string

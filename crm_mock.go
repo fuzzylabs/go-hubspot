@@ -14,31 +14,31 @@ var _ IHubspotCRMAPI = &IHubspotCRMAPIMock{}
 
 // IHubspotCRMAPIMock is a mock implementation of IHubspotCRMAPI.
 //
-// 	func TestSomethingThatUsesIHubspotCRMAPI(t *testing.T) {
+//	func TestSomethingThatUsesIHubspotCRMAPI(t *testing.T) {
 //
-// 		// make and configure a mocked IHubspotCRMAPI
-// 		mockedIHubspotCRMAPI := &IHubspotCRMAPIMock{
-// 			GetCompanyForContactFunc: func(contactID string) (string, error) {
-// 				panic("mock out the GetCompanyForContact method")
-// 			},
-// 			GetDealForCompanyFunc: func(companyID string) (string, error) {
-// 				panic("mock out the GetDealForCompany method")
-// 			},
-// 			SearchCompaniesFunc: func(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
-// 				panic("mock out the SearchCompanies method")
-// 			},
-// 			SearchContactsFunc: func(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
-// 				panic("mock out the SearchContacts method")
-// 			},
-// 			UpdateCompanyFunc: func(companyID string, jsonPayload *bytes.Buffer) error {
-// 				panic("mock out the UpdateCompany method")
-// 			},
-// 		}
+//		// make and configure a mocked IHubspotCRMAPI
+//		mockedIHubspotCRMAPI := &IHubspotCRMAPIMock{
+//			GetCompanyForContactFunc: func(contactID string) (string, error) {
+//				panic("mock out the GetCompanyForContact method")
+//			},
+//			GetDealForCompanyFunc: func(companyID string) (string, error) {
+//				panic("mock out the GetDealForCompany method")
+//			},
+//			SearchCompaniesFunc: func(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
+//				panic("mock out the SearchCompanies method")
+//			},
+//			SearchContactsFunc: func(filterMap map[string]string, properties []string) ([]HubSpotSearchResult, error) {
+//				panic("mock out the SearchContacts method")
+//			},
+//			UpdateCompanyFunc: func(companyID string, jsonPayload *bytes.Buffer) error {
+//				panic("mock out the UpdateCompany method")
+//			},
+//		}
 //
-// 		// use mockedIHubspotCRMAPI in code that requires IHubspotCRMAPI
-// 		// and then make assertions.
+//		// use mockedIHubspotCRMAPI in code that requires IHubspotCRMAPI
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHubspotCRMAPIMock struct {
 	// GetCompanyForContactFunc mocks the GetCompanyForContact method.
 	GetCompanyForContactFunc func(contactID string) (string, error)
@@ -114,7 +114,8 @@ func (mock *IHubspotCRMAPIMock) GetCompanyForContact(contactID string) (string, 
 
 // GetCompanyForContactCalls gets all the calls that were made to GetCompanyForContact.
 // Check the length with:
-//     len(mockedIHubspotCRMAPI.GetCompanyForContactCalls())
+//
+//	len(mockedIHubspotCRMAPI.GetCompanyForContactCalls())
 func (mock *IHubspotCRMAPIMock) GetCompanyForContactCalls() []struct {
 	ContactID string
 } {
@@ -145,7 +146,8 @@ func (mock *IHubspotCRMAPIMock) GetDealForCompany(companyID string) (string, err
 
 // GetDealForCompanyCalls gets all the calls that were made to GetDealForCompany.
 // Check the length with:
-//     len(mockedIHubspotCRMAPI.GetDealForCompanyCalls())
+//
+//	len(mockedIHubspotCRMAPI.GetDealForCompanyCalls())
 func (mock *IHubspotCRMAPIMock) GetDealForCompanyCalls() []struct {
 	CompanyID string
 } {
@@ -178,7 +180,8 @@ func (mock *IHubspotCRMAPIMock) SearchCompanies(filterMap map[string]string, pro
 
 // SearchCompaniesCalls gets all the calls that were made to SearchCompanies.
 // Check the length with:
-//     len(mockedIHubspotCRMAPI.SearchCompaniesCalls())
+//
+//	len(mockedIHubspotCRMAPI.SearchCompaniesCalls())
 func (mock *IHubspotCRMAPIMock) SearchCompaniesCalls() []struct {
 	FilterMap  map[string]string
 	Properties []string
@@ -213,7 +216,8 @@ func (mock *IHubspotCRMAPIMock) SearchContacts(filterMap map[string]string, prop
 
 // SearchContactsCalls gets all the calls that were made to SearchContacts.
 // Check the length with:
-//     len(mockedIHubspotCRMAPI.SearchContactsCalls())
+//
+//	len(mockedIHubspotCRMAPI.SearchContactsCalls())
 func (mock *IHubspotCRMAPIMock) SearchContactsCalls() []struct {
 	FilterMap  map[string]string
 	Properties []string
@@ -248,7 +252,8 @@ func (mock *IHubspotCRMAPIMock) UpdateCompany(companyID string, jsonPayload *byt
 
 // UpdateCompanyCalls gets all the calls that were made to UpdateCompany.
 // Check the length with:
-//     len(mockedIHubspotCRMAPI.UpdateCompanyCalls())
+//
+//	len(mockedIHubspotCRMAPI.UpdateCompanyCalls())
 func (mock *IHubspotCRMAPIMock) UpdateCompanyCalls() []struct {
 	CompanyID   string
 	JsonPayload *bytes.Buffer

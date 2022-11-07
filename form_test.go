@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"fmt"
 )
 
 // getFormAPI Get default HubSpot Form API client
@@ -155,8 +156,8 @@ func TestGetNextAfter(t *testing.T) {
 
 func TestSearchForApplicationID(t *testing.T) {
 	mockHubspotHTTPClient := IHTTPClientMock{
-		DoFunc: func(req *http.Request) (resp *http.Response, err error) { return nil, nil },
-		GetFunc: func(url string) (resp *http.Response, err error) {
+		DoFunc: func(req *http.Request) (resp *http.Response, err error) {
+			url := fmt.Sprintf("%s", req.URL)
 			w := httptest.NewRecorder()
 			if url == "https://example.com/form_id?limit=50&after=" {
 				w.WriteHeader(200)
