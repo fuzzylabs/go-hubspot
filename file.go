@@ -11,12 +11,14 @@ import (
 )
 
 type IHubspotFileAPI interface {
+	GetPageURL() string
+	MakeFilePublic(fileId string) (string, error)
 	UploadFile(file []byte, folderPath, fileName string) (string, error)
 }
 
 // HubspotFileAPI is the structure to interact with Hubspot File API
 type HubspotFileAPI struct {
-	URL string
+	URLTemplate string
 	APIKey      string
 	PortalID    string
 	httpClient  IHTTPClient
@@ -24,24 +26,79 @@ type HubspotFileAPI struct {
 
 // FileUploadResponse response of the file API
 type FileUploadResponse struct {
-	Id string `json:"id"`
+	Id  string `json:"id"`
+	Url string `json:"url"`
 }
 
 // NewHubspotFileAPI creates new HubspotFileAPI and API key
 func NewHubspotFileAPI(apiKey string, portalId string) HubspotFileAPI {
 	return HubspotFileAPI{
-		URL: "https://api.hubapi.com/files/v3/files",
+		URLTemplate: "https://api.hubapi.com/files/v3/files%s",
 		APIKey:      apiKey,
 		PortalID:    portalId,
 		httpClient:  HTTPClient{},
 	}
 }
 
+// GetPageURL gets query URL for a page of results
+func (api HubspotFileAPI) GetPageURL() string {
+	return fmt.Sprintf(
+		api.URLTemplate,
+		"",
+	)
+}
+
+func (api HubspotFileAPI) GetPageUrlById(fileId string) string {
+	return fmt.Sprintf(
+		api.URLTemplate,
+		"/"+fileId,
+	)
+}
+
 type FileUploadOptions struct {
-	Access                      string `json:"access"`
-	Overwrite                   bool   `json:"overwrite"`
-	DuplicateValidationStrategy string `json:"duplicateValidationStrategy"`
-	DuplicateValidationScope    string `json:"duplicateValidationScope"`
+	Access                      string `json:"access,omitempty"`
+	Overwrite                   bool   `json:"overwrite,omitempty"`
+	DuplicateValidationStrategy string `json:"duplicateValidationStrategy,omitempty"`
+	DuplicateValidationScope    string `json:"duplicateValidationScope,omitempty"`
+}
+
+func (api HubspotFileAPI) MakeFilePublic(fileId string) (string, error) {
+	options, err := json.Marshal(FileUploadOptions{Access: "PUBLIC_NOT_INDEXABLE"})
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, api.GetPageUrlById(fileId), bytes.NewBuffer(options))
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error whuke marshling options: %s", err.Error()))
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := api.httpClient.Do(req)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while making a request: %s", err.Error()))
+	}
+
+	if resp.StatusCode != 200 {
+		return "", errors.New(fmt.Sprintf("Request to HubSpot File API failed: %s", resp.Status))
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while reading response body: %s", err.Error()))
+	}
+
+	var hubspotResp FileUploadResponse
+	err = json.Unmarshal(body, &hubspotResp)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while unmarshaling HubSpot response: %s", err.Error()))
+	}
+
+	return hubspotResp.Url, nil
 }
 
 func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (string, error) {
@@ -85,7 +142,7 @@ func (api HubspotFileAPI) UploadFile(file []byte, folderPath, fileName string) (
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", api.URL, &data)
+	req, err := http.NewRequest("POST", api.GetPageURL(), &data)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("Error while constructing a request: %s", err.Error()))
 	}

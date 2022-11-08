@@ -103,6 +103,8 @@ func main() {
 * Mocks for `go-hubspot` API interfaces, to make testing of applications that use the library easier
 
 ```
+go get github.com/matryer/moq
+go install github.com/matryer/moq
 go generate
 ```
 
