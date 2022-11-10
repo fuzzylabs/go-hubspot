@@ -89,9 +89,8 @@ func NewHubspotDealFlowAPI(apiKey string) HubspotDealFlowAPI {
 // AssociateDealFlowCard associates a deal flow card with a company or contact using the internal HubSpot dealId and companyId/contactId
 // Choose whether to associate a company or contact by setting assocType to "contact" or "company"
 func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType, assocType string) error {
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/associations/deal/%s/batch/create?hapikey=%s",
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/associations/deal/%s/batch/create",
 		objectType,
-		api.APIKey,
 	)
 
 	associationRequest := DealAssociationBatchRequest{
@@ -115,6 +114,7 @@ func (api HubspotDealFlowAPI) AssociateDealFlowCard(dealId, assocId, objectType,
 		return err
 	}
 
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	_, err = api.httpClient.Do(req)
@@ -140,7 +140,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 
 	log.Infof("Creating a deal flow card")
 
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals?hapikey=%s", api.APIKey)
+	url := "https://api.hubapi.com/crm/v3/objects/deals"
 
 	creationRequest := dealCreationRequest{
 		map[string]string{
@@ -162,6 +162,7 @@ func (api HubspotDealFlowAPI) CreateDealFlowCard(
 	}
 
 	req, err := http.NewRequest("POST", url, payloadBuf)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return nil, err
@@ -211,7 +212,7 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 
 	log.Infof("Updating a deal flow card")
 
-	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s?hapikey=%s", dealId, api.APIKey)
+	url := fmt.Sprintf("https://api.hubapi.com/crm/v3/objects/deals/%s", dealId)
 
 	updateRequest := dealUpdateRequest{
 		properties,
@@ -224,6 +225,7 @@ func (api HubspotDealFlowAPI) UpdateDealFlowCard(
 	}
 
 	req, err := http.NewRequest("PATCH", url, payloadBuf)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return err

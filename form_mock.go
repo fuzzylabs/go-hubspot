@@ -13,25 +13,25 @@ var _ IHubspotFormAPI = &IHubspotFormAPIMock{}
 
 // IHubspotFormAPIMock is a mock implementation of IHubspotFormAPI.
 //
-// 	func TestSomethingThatUsesIHubspotFormAPI(t *testing.T) {
+//	func TestSomethingThatUsesIHubspotFormAPI(t *testing.T) {
 //
-// 		// make and configure a mocked IHubspotFormAPI
-// 		mockedIHubspotFormAPI := &IHubspotFormAPIMock{
-// 			GetPageURLFunc: func(after string) string {
-// 				panic("mock out the GetPageURL method")
-// 			},
-// 			QueryFunc: func(after string) (*HubspotResponse, error) {
-// 				panic("mock out the Query method")
-// 			},
-// 			SearchForKeyValueFunc: func(key string, value string) (map[string]HubspotFormField, error) {
-// 				panic("mock out the SearchForKeyValue method")
-// 			},
-// 		}
+//		// make and configure a mocked IHubspotFormAPI
+//		mockedIHubspotFormAPI := &IHubspotFormAPIMock{
+//			GetPageURLFunc: func(after string) string {
+//				panic("mock out the GetPageURL method")
+//			},
+//			QueryFunc: func(after string) (*HubspotResponse, error) {
+//				panic("mock out the Query method")
+//			},
+//			SearchForKeyValueFunc: func(key string, value string) (map[string]HubspotFormField, error) {
+//				panic("mock out the SearchForKeyValue method")
+//			},
+//		}
 //
-// 		// use mockedIHubspotFormAPI in code that requires IHubspotFormAPI
-// 		// and then make assertions.
+//		// use mockedIHubspotFormAPI in code that requires IHubspotFormAPI
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHubspotFormAPIMock struct {
 	// GetPageURLFunc mocks the GetPageURL method.
 	GetPageURLFunc func(after string) string
@@ -85,7 +85,8 @@ func (mock *IHubspotFormAPIMock) GetPageURL(after string) string {
 
 // GetPageURLCalls gets all the calls that were made to GetPageURL.
 // Check the length with:
-//     len(mockedIHubspotFormAPI.GetPageURLCalls())
+//
+//	len(mockedIHubspotFormAPI.GetPageURLCalls())
 func (mock *IHubspotFormAPIMock) GetPageURLCalls() []struct {
 	After string
 } {
@@ -116,7 +117,8 @@ func (mock *IHubspotFormAPIMock) Query(after string) (*HubspotResponse, error) {
 
 // QueryCalls gets all the calls that were made to Query.
 // Check the length with:
-//     len(mockedIHubspotFormAPI.QueryCalls())
+//
+//	len(mockedIHubspotFormAPI.QueryCalls())
 func (mock *IHubspotFormAPIMock) QueryCalls() []struct {
 	After string
 } {
@@ -149,7 +151,8 @@ func (mock *IHubspotFormAPIMock) SearchForKeyValue(key string, value string) (ma
 
 // SearchForKeyValueCalls gets all the calls that were made to SearchForKeyValue.
 // Check the length with:
-//     len(mockedIHubspotFormAPI.SearchForKeyValueCalls())
+//
+//	len(mockedIHubspotFormAPI.SearchForKeyValueCalls())
 func (mock *IHubspotFormAPIMock) SearchForKeyValueCalls() []struct {
 	Key   string
 	Value string

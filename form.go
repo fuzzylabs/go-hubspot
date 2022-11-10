@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-
+	"net/http"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -49,7 +49,7 @@ type HubspotResponse struct {
 // NewHubspotFormAPI creates new HubspotFormAPI with form ID and API key
 func NewHubspotFormAPI(formID string, apiKey string) HubspotFormAPI {
 	return HubspotFormAPI{
-		URLTemplate: "https://api.hubapi.com/form-integrations/v1/submissions/forms/%s?hapikey=%s&limit=50&after=%s",
+		URLTemplate: "https://api.hubapi.com/form-integrations/v1/submissions/forms/%s?limit=50&after=%s",
 		FormID:      formID,
 		APIKey:      apiKey,
 		httpClient:  HTTPClient{},
@@ -106,7 +106,6 @@ func (api HubspotFormAPI) GetPageURL(after string) string {
 	return fmt.Sprintf(
 		api.URLTemplate,
 		api.FormID,
-		api.APIKey,
 		after,
 	)
 }
@@ -115,7 +114,11 @@ func (api HubspotFormAPI) GetPageURL(after string) string {
 func (api HubspotFormAPI) Query(after string) (*HubspotResponse, error) {
 	url := api.GetPageURL(after)
 
-	resp, err := api.httpClient.Get(url)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api.APIKey))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := api.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

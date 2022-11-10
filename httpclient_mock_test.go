@@ -14,28 +14,22 @@ var _ IHTTPClient = &IHTTPClientMock{}
 
 // IHTTPClientMock is a mock implementation of IHTTPClient.
 //
-// 	func TestSomethingThatUsesIHTTPClient(t *testing.T) {
+//	func TestSomethingThatUsesIHTTPClient(t *testing.T) {
 //
-// 		// make and configure a mocked IHTTPClient
-// 		mockedIHTTPClient := &IHTTPClientMock{
-// 			DoFunc: func(req *http.Request) (*http.Response, error) {
-// 				panic("mock out the Do method")
-// 			},
-// 			GetFunc: func(url string) (*http.Response, error) {
-// 				panic("mock out the Get method")
-// 			},
-// 		}
+//		// make and configure a mocked IHTTPClient
+//		mockedIHTTPClient := &IHTTPClientMock{
+//			DoFunc: func(req *http.Request) (*http.Response, error) {
+//				panic("mock out the Do method")
+//			},
+//		}
 //
-// 		// use mockedIHTTPClient in code that requires IHTTPClient
-// 		// and then make assertions.
+//		// use mockedIHTTPClient in code that requires IHTTPClient
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHTTPClientMock struct {
 	// DoFunc mocks the Do method.
 	DoFunc func(req *http.Request) (*http.Response, error)
-
-	// GetFunc mocks the Get method.
-	GetFunc func(url string) (*http.Response, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,14 +38,8 @@ type IHTTPClientMock struct {
 			// Req is the req argument value.
 			Req *http.Request
 		}
-		// Get holds details about calls to the Get method.
-		Get []struct {
-			// URL is the url argument value.
-			URL string
-		}
 	}
-	lockDo  sync.RWMutex
-	lockGet sync.RWMutex
+	lockDo sync.RWMutex
 }
 
 // Do calls DoFunc.
@@ -72,7 +60,8 @@ func (mock *IHTTPClientMock) Do(req *http.Request) (*http.Response, error) {
 
 // DoCalls gets all the calls that were made to Do.
 // Check the length with:
-//     len(mockedIHTTPClient.DoCalls())
+//
+//	len(mockedIHTTPClient.DoCalls())
 func (mock *IHTTPClientMock) DoCalls() []struct {
 	Req *http.Request
 } {
@@ -82,36 +71,5 @@ func (mock *IHTTPClientMock) DoCalls() []struct {
 	mock.lockDo.RLock()
 	calls = mock.calls.Do
 	mock.lockDo.RUnlock()
-	return calls
-}
-
-// Get calls GetFunc.
-func (mock *IHTTPClientMock) Get(url string) (*http.Response, error) {
-	if mock.GetFunc == nil {
-		panic("IHTTPClientMock.GetFunc: method is nil but IHTTPClient.Get was just called")
-	}
-	callInfo := struct {
-		URL string
-	}{
-		URL: url,
-	}
-	mock.lockGet.Lock()
-	mock.calls.Get = append(mock.calls.Get, callInfo)
-	mock.lockGet.Unlock()
-	return mock.GetFunc(url)
-}
-
-// GetCalls gets all the calls that were made to Get.
-// Check the length with:
-//     len(mockedIHTTPClient.GetCalls())
-func (mock *IHTTPClientMock) GetCalls() []struct {
-	URL string
-} {
-	var calls []struct {
-		URL string
-	}
-	mock.lockGet.RLock()
-	calls = mock.calls.Get
-	mock.lockGet.RUnlock()
 	return calls
 }

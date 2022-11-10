@@ -11,19 +11,19 @@ and [File](https://developers.hubspot.com/docs/api/files/files) APIs.
 You can install the module directly from GitHub.
 
 ```shell
-go get -u github.com/fuzzylabs/go-hubspot@<version>
+go get -u github.com/ericctsf/go-hubspot@<version>
 ```
 
 Where version can point to a commit hash or a branch, for example:
 
 ```shell
-go get -u github.com/fuzzylabs/go-hubspot@9302e1d
+go get -u github.com/ericctsf/go-hubspot@9302e1d
 ```
 
 or 
 
 ```shell
-go get -u github.com/fuzzylabs/go-hubspot@master
+go get -u github.com/ericctsf/go-hubspot@master
 ```
 
 Note: specifying the branch will not update the import when updates are made to that branch.
@@ -31,7 +31,7 @@ Note: specifying the branch will not update the import when updates are made to 
 You can then import the library as follows:
 ```go
 import (
-	hubspot "github.com/fuzzylabs/go-hubspot"
+	hubspot "github.com/ericctsf/go-hubspot"
 )
 ```
 
@@ -41,7 +41,7 @@ Search for form submissions with the first name John:
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/go-hubspot"
+	hubspot "github.com/ericctsf/go-hubspot"
 )
 
 func main() {
@@ -55,7 +55,7 @@ Get company ID associated with a contact:
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/go-hubspot"
+	hubspot "github.com/ericctsf/go-hubspot"
 )
 
 func main() {
@@ -69,7 +69,7 @@ Update move a DealFlow card to another column (i.e. update its `dealstage` prope
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/go-hubspot"
+	hubspot "github.com/ericctsf/go-hubspot"
 )
 
 func main() {
@@ -88,7 +88,7 @@ Upload a file to the HubSpot CRM
 package main
 
 import (
-	hubspot "github.com/fuzzylabs/go-hubspot"
+	hubspot "github.com/ericctsf/go-hubspot"
 )
 
 func main() {
@@ -103,6 +103,8 @@ func main() {
 * Mocks for `go-hubspot` API interfaces, to make testing of applications that use the library easier
 
 ```
+go get github.com/matryer/moq
+go install github.com/matryer/moq
 go generate
 ```
 

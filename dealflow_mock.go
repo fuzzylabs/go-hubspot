@@ -13,25 +13,25 @@ var _ IHubspotDealFlowAPI = &IHubspotDealFlowAPIMock{}
 
 // IHubspotDealFlowAPIMock is a mock implementation of IHubspotDealFlowAPI.
 //
-// 	func TestSomethingThatUsesIHubspotDealFlowAPI(t *testing.T) {
+//	func TestSomethingThatUsesIHubspotDealFlowAPI(t *testing.T) {
 //
-// 		// make and configure a mocked IHubspotDealFlowAPI
-// 		mockedIHubspotDealFlowAPI := &IHubspotDealFlowAPIMock{
-// 			AssociateDealFlowCardFunc: func(dealId string, assocId string, objectType string, assocType string) error {
-// 				panic("mock out the AssociateDealFlowCard method")
-// 			},
-// 			CreateDealFlowCardFunc: func(cardName string, contactID string, contactAssocType string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error) {
-// 				panic("mock out the CreateDealFlowCard method")
-// 			},
-// 			UpdateDealFlowCardFunc: func(dealId string, properties map[string]string) error {
-// 				panic("mock out the UpdateDealFlowCard method")
-// 			},
-// 		}
+//		// make and configure a mocked IHubspotDealFlowAPI
+//		mockedIHubspotDealFlowAPI := &IHubspotDealFlowAPIMock{
+//			AssociateDealFlowCardFunc: func(dealId string, assocId string, objectType string, assocType string) error {
+//				panic("mock out the AssociateDealFlowCard method")
+//			},
+//			CreateDealFlowCardFunc: func(cardName string, contactID string, contactAssocType string, companyID string, stageName string, pipeline string, ownerId string, otherProperties map[string]string) (*DealCreationResponse, error) {
+//				panic("mock out the CreateDealFlowCard method")
+//			},
+//			UpdateDealFlowCardFunc: func(dealId string, properties map[string]string) error {
+//				panic("mock out the UpdateDealFlowCard method")
+//			},
+//		}
 //
-// 		// use mockedIHubspotDealFlowAPI in code that requires IHubspotDealFlowAPI
-// 		// and then make assertions.
+//		// use mockedIHubspotDealFlowAPI in code that requires IHubspotDealFlowAPI
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IHubspotDealFlowAPIMock struct {
 	// AssociateDealFlowCardFunc mocks the AssociateDealFlowCard method.
 	AssociateDealFlowCardFunc func(dealId string, assocId string, objectType string, assocType string) error
@@ -111,7 +111,8 @@ func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCard(dealId string, assocI
 
 // AssociateDealFlowCardCalls gets all the calls that were made to AssociateDealFlowCard.
 // Check the length with:
-//     len(mockedIHubspotDealFlowAPI.AssociateDealFlowCardCalls())
+//
+//	len(mockedIHubspotDealFlowAPI.AssociateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) AssociateDealFlowCardCalls() []struct {
 	DealId     string
 	AssocId    string
@@ -162,7 +163,8 @@ func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCard(cardName string, contact
 
 // CreateDealFlowCardCalls gets all the calls that were made to CreateDealFlowCard.
 // Check the length with:
-//     len(mockedIHubspotDealFlowAPI.CreateDealFlowCardCalls())
+//
+//	len(mockedIHubspotDealFlowAPI.CreateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) CreateDealFlowCardCalls() []struct {
 	CardName         string
 	ContactID        string
@@ -209,7 +211,8 @@ func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCard(dealId string, propertie
 
 // UpdateDealFlowCardCalls gets all the calls that were made to UpdateDealFlowCard.
 // Check the length with:
-//     len(mockedIHubspotDealFlowAPI.UpdateDealFlowCardCalls())
+//
+//	len(mockedIHubspotDealFlowAPI.UpdateDealFlowCardCalls())
 func (mock *IHubspotDealFlowAPIMock) UpdateDealFlowCardCalls() []struct {
 	DealId     string
 	Properties map[string]string
